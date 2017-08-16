@@ -24,6 +24,7 @@ byte Axis::moveTo(float target)
     return MOVE_BEFORE_HOME;
   }
 
+  //TODO: Figure this out. Check directions.
   
   float motion  = target - (_curr_step*_step_cal);
 
@@ -42,6 +43,8 @@ byte Axis::home()
   {
     return LOCK_LOST;
   }
+
+  //TODO: Check directions.
   _setDir(0);
 
   while(!digitalRead(_home))
@@ -118,6 +121,8 @@ byte Axis::_takeSteps(int steps, char dir)
     else
     {
       takeStep();
+      //TODO: Figure this out properly. Positive should be away from home.
+      dir += dir ?  1 : -1;
     }
   }
 
