@@ -40,6 +40,7 @@ private:
   byte _dir;
   byte _home;
   float _step_cal;
+  int _curr_step;
   Axis **_lock;
 
   /**

@@ -8,21 +8,58 @@ Axis::Axis(Axis **lock, byte step_clk, byte dir, byte home, float step_cal)
   _dir = dir;
   _home = home;
   _step_cal = step_cal;
+  _curr_step = -1;
 
+  
   pinMode(_step_clk, OUTPUT);
   pinMode(_dir, OUTPUT);
   pinMode(_home, INPUT);
 }
 
 
-byte Axis::moveTo(float)
+byte Axis::moveTo(float target)
 {
-  //TODO: finish this implementation
-  return 0;
+  if(_curr_step < 0)
+  {
+    return MOVE_BEFORE_HOME;
+  }
+
+  
+  float motion  = target - (_curr_step*_step_cal);
+
+  char dir = motion > 0;
+
+  int steps = (int) round((motion/_step_cal));
+
+  _requestLock();
+  return _takeSteps(steps,dir);
 }
 
 
-byte Axis::home();
+byte Axis::home()
+{
+  if(!_checkLock())
+  {
+    return LOCK_LOST;
+  }
+  _setDir(0);
+
+  while(!digitalRead(_home))
+  {
+    if(!_checkLock())
+    {
+      return LOCK_LOST;
+    }
+    else
+    {
+      takeStep();
+    }
+  }
+
+  _curr_steps = 0;
+  
+  return 0;
+}
   
 
 void Axis::_requestLock()
