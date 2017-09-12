@@ -1,22 +1,48 @@
-import serial
-ser = serial.Serial('/dev/ttyUSB0', 9600)
+headerhelp = \
+'''
+ABOT runs a set of Apricot-Bot commands.
 
-comms = dict(zip(*[['xhome','yhome','zhome',
-                    'ledblink',
-                    'xfwd','yfwd','zfwd',
-                    'xback','yback','zback',
-                    'phomedn','phomeup','pistonup','pistondn',],
-                    range(1,15)]))
+The set of available commands is automatically extracted from a header
+file (should be the same as the one used by Arduino driver!).  
+Specifically, define statements will be parsed for the COMM_* patterns.
+Uppercase only
+'''
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
+                        description=headerhelp)
+parser.add_argument('-d', '--hfile', default='sercomm.h', help='Header file from which command table is extracted.')
+parser.add_argument('-c', '--cfile', help='Command file, defaults to stdin.')
+parser.add_argument('-s', '--serial-port', default='USB0', help='Serial port, efaults to USB0.  Actual port is /dev/ttyXXXX.')
+parser.add_argument('--dry-run', action='store_true', help='Dry run.')
 
+args, xtra_argv = parser.parse_known_args()
+
+import re, sys
+
+ptrn_def = re.compile("^#define *COMM_([A-Z]*) *(\d*)")
+with open(args.hfile) as fhead:
+    comms = dict([x.groups() for x in map(ptrn_def.match, fhead.readlines()) if x])
 
 def makecomm(a,b):
-    return str(comms[a]).ljust(4)+str(b).ljust(8)
+    return str(comms.get(a.upper(),'')).ljust(4)+str(b).ljust(8)
 
 
-for i in range(11):
- ser.write(makecomm('zback',1000))
- ser.write(makecomm('yback',281))
- ser.write(makecomm('zfwd',1000))
- ser.write(makecomm('pistondn',1000))
-
-ser.close()
+if not args.dry_run:
+    import serial
+    ser = serial.Serial('/dev/tty'+args.serial_port, 9600)
+if args.cfile:
+    fcomm = open(args.cfile)
+else:
+    fcomm = sys.stdin
+for line in fcomm.readlines():
+    if line.strip().lower() == 'end':
+        break
+    valComm, valParam = (line.split()+['',''])[:2]
+    sys.stdout.write('INPUT: '+line)
+    sys.stdout.write('SEND : |'+makecomm(valComm, valParam)+'|\n')
+    if not args.dry_run:
+        ser.write(makecomm(valComm, valParam))
+if args.cfile:
+    fcomm.close()
+if not args.dry_run:
+    ser.close()
