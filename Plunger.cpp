@@ -1,9 +1,9 @@
-#include"Arduino.h"
-#include"Plunger.cpp"
+#include "Arduino.h"
+#include "Plunger.h"
 
 Plunger::Plunger()
 {
-  return 0;
+  
 }
   
 byte Plunger::dispense(float)

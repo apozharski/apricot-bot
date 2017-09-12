@@ -55,11 +55,11 @@ byte Axis::home()
     }
     else
     {
-      takeStep();
+      _takeStep();
     }
   }
 
-  _curr_steps = 0;
+  _curr_step = 0;
   
   return 0;
 }
@@ -82,9 +82,9 @@ bool Axis::_checkLock()
 
 void Axis::_takeStep()
 {
-  digitalWrite(STEP_CL, HIGH);
+  digitalWrite(_step_clk, HIGH);
   delayMicroseconds(STEP_GAP);
-  digitalWrite(STEP_CLK, LOW);
+  digitalWrite(_step_clk, LOW);
   delayMicroseconds(STEP_GAP);
 }
 
@@ -120,7 +120,7 @@ byte Axis::_takeSteps(int steps, char dir)
     }
     else
     {
-      takeStep();
+      _takeStep();
       //TODO: Figure this out properly. Positive should be away from home.
       dir += dir ?  1 : -1;
     }
@@ -131,6 +131,6 @@ byte Axis::_takeSteps(int steps, char dir)
 
 void Axis::dummyHome()
 {
-   _curr_steps = 0;
+   _curr_step = 0;
 }
   

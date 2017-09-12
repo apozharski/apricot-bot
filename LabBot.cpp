@@ -1,6 +1,6 @@
-#include"Arduino.h"
-#include"Axis.h"
-#include"LabBot.h"
+#include "Arduino.h"
+#include "Axis.h"
+#include "LabBot.h"
 
 LabBot LabBot::getInstance()
 {
@@ -33,6 +33,6 @@ byte LabBot::home()
   _z.home();
 }
 
-LabBot::LabBot(float x_cal, float y_cal, float z_cal) : _x(&lock,0,1,2,x_cal) : _y(&lock,3,4,5,y_cal) : _z(&lock,6,7,8,z_cal)
-{}
+//LabBot::LabBot(float x_cal, float y_cal, float z_cal) : _x(&lock,0,1,2,x_cal) : _y(&lock,3,4,5,y_cal) : _z(&lock,6,7,8,z_cal)
+//{}
 
