@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 headerhelp = \
 '''
 ABOT runs a set of Apricot-Bot commands.
@@ -17,7 +18,7 @@ parser.add_argument('--dry-run', action='store_true', help='Dry run.')
 
 args, xtra_argv = parser.parse_known_args()
 
-import re, sys
+import re, sys, time
 
 ptrn_def = re.compile("^#define *COMM_([A-Z]*) *(\d*)")
 with open(args.hfile) as fhead:
@@ -30,6 +31,7 @@ def makecomm(a,b):
 if not args.dry_run:
     import serial
     ser = serial.Serial('/dev/tty'+args.serial_port, 9600)
+    time.sleep(1)
 if args.cfile:
     fcomm = open(args.cfile)
 else:
@@ -41,7 +43,8 @@ for line in fcomm.readlines():
     sys.stdout.write('INPUT: '+line)
     sys.stdout.write('SEND : |'+makecomm(valComm, valParam)+'|\n')
     if not args.dry_run:
-        ser.write(makecomm(valComm, valParam))
+        print ser.write(makecomm(valComm, valParam))
+        print ser.readline()
 if args.cfile:
     fcomm.close()
 if not args.dry_run:

@@ -1,14 +1,1 @@
-#define COMM_XHOME      1
-#define COMM_YHOME      2
-#define COMM_ZHOME      3
-#define COMM_LEDBLINK   4
-#define COMM_XFWD       5
-#define COMM_YFWD       6
-#define COMM_ZFWD       7
-#define COMM_XBACK      8
-#define COMM_YBACK      9
-#define COMM_ZBACK      10
-#define COMM_PHOMEDN    11
-#define COMM_PHOMEUP    12
-#define COMM_PISTONDN   13
-#define COMM_PISTONUP   14
+../sandbox/abot/sercomm.h
