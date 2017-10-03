@@ -11,3 +11,6 @@ class ApriTarget(object):
         if self.name is None:
             self.bot.home()
 
+class ApriTarg1D(ApriTarget):
+    def goto(self, position):
+        self.bot.xgoto(position*dx)
