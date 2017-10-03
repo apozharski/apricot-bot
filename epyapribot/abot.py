@@ -43,7 +43,7 @@ class TheBot(object):
         print self.runcomm('zhome')
         self.z = 0
     def xgoto(self, x):
-        if x < 0 or x > XLIMIT:
+        if x < 0 or x > XLIMIT or x is None:
             return
         if self.x < x:
             print self.runcomm('xfwd', x-self.x)
@@ -51,7 +51,7 @@ class TheBot(object):
             print self.runcomm('xback', self.x-x)
         self.x = x
     def ygoto(self, y):
-        if y < 0 or y > YLIMIT:
+        if y < 0 or y > YLIMIT or y is None:
             return
         if self.y < y:
             print self.runcomm('yfwd', y-self.y)
@@ -59,7 +59,7 @@ class TheBot(object):
             print self.runcomm('yback', self.y-y)
         self.y = y
     def zgoto(self, z):
-        if z < 0 or z > ZLIMIT:
+        if z < 0 or z > ZLIMIT or z is None:
             return
         if self.z < z:
             print self.runcomm('zfwd', z-self.z)
@@ -73,11 +73,15 @@ class TheBot(object):
         print self.runcomm('phomeup')
         self.piston = PLIMIT
     def pgoto(self, v):
-        if v < 0:
+        if v < 0 or v is None:
             return
         if self.piston < v:
             print self.runcomm('pistonup', v-self.piston)
         else:
             print self.runcomm('pistondn', self.piston-z)
         self.piston = v
-        
+    def goto(self, x, y, z, v):
+        self.xgoto(x)
+        self.ygoto(y)
+        self.zgoto(z)
+        self.pgoto(v)
