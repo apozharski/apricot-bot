@@ -1,8 +1,13 @@
 class ApriTarget(object):
+    def __init__(self, bot, *args, **kwds):
+        self.abot = abot
+        self.nx = kwds.pop('nx', None)
+        self.ny = kwds.pop('ny', None)
+        self.dx = kwds.pop('dx', None)
+        self.dy = kwds.pop('dy', None)
+        self.name = kwds.pop('name',None)
+        self.xkwds = kwds
+    def goto(self, *args, **kwds):
+        if self.name is None:
+            self.bot.home()
 
-    def __init__(self, parms, *args, **kwds):
-        for key, value in parms.iteritems():
-            try:
-                exec('self.'+key+'='+str(value))
-            except NameError:
-                exec('self.'+key+'="'+str(value)+'"')
