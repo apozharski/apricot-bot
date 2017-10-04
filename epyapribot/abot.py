@@ -47,7 +47,7 @@ class TheBot(object):
             return
         if self.x < x:
             print self.runcomm('xfwd', x-self.x)
-        else:
+        elif self.x > x:
             print self.runcomm('xback', self.x-x)
         self.x = x
     def ygoto(self, y):
@@ -55,7 +55,7 @@ class TheBot(object):
             return
         if self.y < y:
             print self.runcomm('yfwd', y-self.y)
-        else:
+        elif self.y > y:
             print self.runcomm('yback', self.y-y)
         self.y = y
     def zgoto(self, z):
@@ -63,7 +63,7 @@ class TheBot(object):
             return
         if self.z < z:
             print self.runcomm('zfwd', z-self.z)
-        else:
+        elif self.z > z:
             print self.runcomm('zback', self.z-z)
         self.z = z
     def phomedn(self):
@@ -77,8 +77,8 @@ class TheBot(object):
             return
         if self.piston < v:
             print self.runcomm('pistonup', v-self.piston)
-        else:
-            print self.runcomm('pistondn', self.piston-z)
+        elif self.piston > v:
+            print self.runcomm('pistondn', self.piston-v)
         self.piston = v
     def goto(self, x=None, y=None, z=None, v=None, xyzv=None):
         if xyzv is not None:
