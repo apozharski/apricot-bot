@@ -80,7 +80,9 @@ class TheBot(object):
         else:
             print self.runcomm('pistondn', self.piston-z)
         self.piston = v
-    def goto(self, x, y, z, v):
+    def goto(self, x=None, y=None, z=None, v=None, xyzv=None):
+        if xyzv is not None:
+            x,y,z,v = xyzv
         self.xgoto(x)
         self.ygoto(y)
         self.zgoto(z)
