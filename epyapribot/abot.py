@@ -80,10 +80,11 @@ class TheBot(object):
         elif self.piston > v:
             print self.runcomm('pistondn', self.piston-v)
         self.piston = v
-    def goto(self, x=None, y=None, z=None, v=None, xyzv=None):
+    def goto(self, x=None, y=None, z=None, v=None, xyzv=None, order=None):
         if xyzv is not None:
             x,y,z,v = xyzv
-        self.xgoto(x)
-        self.ygoto(y)
-        self.zgoto(z)
-        self.pgoto(v)
+        if order is None or type(order) not in [str,unicode]:
+            order = 'xyzv'
+        for c in order:
+            if c in 'xyzv':
+                exec('self.'+c.replace('v','p')+'goto('+c+')')

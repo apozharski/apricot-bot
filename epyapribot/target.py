@@ -1,3 +1,4 @@
+import re
 class ApriTarget(object):
     def __init__(self, parent=None, *args, **kwds):
         self.parent = parent
@@ -53,3 +54,25 @@ class ApriTargetZ(ApriTarget1D):
         super(ApriTargetZ, self).__init__(parent, dz, nz, posz, *args, **kwds)
     def set_xyzv(self):
         self.z = self.get_value()
+
+def load_template(fname, parent=None, label=None):
+    if label is None:
+        label = ''
+    with open(fname) as fin:
+        ptrn_def = re.compile("^"+label+":([a-zA-Z0-9]*) *([a-zA-Z0-9-]*)")
+        defns = dict([(x[0].lower(),x[1]) for x in [x.groups() for x in map(ptrn_def.match, fin.readlines()) if x]])
+    print defns
+    axtype = defns.pop('axis', None)
+    if axtype == 'X':
+        target = ApriTargetX
+    elif axtype == 'Y':
+        target = ApriTargetY
+    elif axtype == 'Z':
+        target = ApriTargetZ
+    else:
+        raise(ValueError('Unknown target axis: '+axtype))
+    start = int(defns.pop('start',0))
+    delta = int(defns.pop('delta',0))
+    nspots = int(defns.pop('nspots',1))
+    return target(parent, start, delta, nspots)
+
