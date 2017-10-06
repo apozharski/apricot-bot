@@ -17,6 +17,16 @@ class ApriTarget(object):
     def goto(self, bot=None):
         if bot is not None:
             bot.goto(xyzv=self.get_xyzv())
+    def safe_goto(self, bot=None):
+        if bot is not None:
+            bot.goto(xyzv=self.get_xyzv(),safez=self.get_safez())
+    def get_safez(self, safez=0):
+        if self.parent is None:
+            return safez
+        else:
+            if 'safez' in dir(self):
+                safez = max(safez, self.safez)
+            return self.parent.get_safez(safez)
 
 class ApriTarget1D(ApriTarget):
     def __init__(self, parent=None, start=0, delta=0, nspots=1, pos = 0, *args, **kwds):
@@ -50,10 +60,17 @@ class ApriTargetY(ApriTarget1D):
         self.y = self.get_value()
 
 class ApriTargetZ(ApriTarget1D):
-    def __init__(self, parent=None, dz=0, nz=1, posz = 0, *args, **kwds):
+    def __init__(self, parent=None, dz=0, nz=1, posz = 0, safez=0, *args, **kwds):
         super(ApriTargetZ, self).__init__(parent, dz, nz, posz, *args, **kwds)
+        self.safez = safez
     def set_xyzv(self):
         self.z = self.get_value()
+
+class ApriTargetV(ApriTarget1D):
+    def __init__(self, parent=None, dv=0, nv=35000, posv = 0, *args, **kwds):
+        super(ApriTargetX, self).__init__(parent, dv, nv, posv, *args, **kwds)
+    def set_xyzv(self):
+        self.v = self.get_value()
 
 def load_template(fname, parent=None, label=None):
     if label is None:
@@ -61,7 +78,6 @@ def load_template(fname, parent=None, label=None):
     with open(fname) as fin:
         ptrn_def = re.compile("^"+label+":([a-zA-Z0-9]*) *([a-zA-Z0-9-]*)")
         defns = dict([(x[0].lower(),x[1]) for x in [x.groups() for x in map(ptrn_def.match, fin.readlines()) if x]])
-    print defns
     axtype = defns.pop('axis', None)
     if axtype == 'X':
         target = ApriTargetX
@@ -69,10 +85,13 @@ def load_template(fname, parent=None, label=None):
         target = ApriTargetY
     elif axtype == 'Z':
         target = ApriTargetZ
+    elif axtype = 'V':
+        target = ApriTargetV
     else:
         raise(ValueError('Unknown target axis: '+axtype))
     start = int(defns.pop('start',0))
     delta = int(defns.pop('delta',0))
     nspots = int(defns.pop('nspots',1))
-    return target(parent, start, delta, nspots)
+    safez = int(defns.pop('safez',0))
+    return target(parent, start, delta, nspots, safez=safez)
 

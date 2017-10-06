@@ -3,13 +3,12 @@ cols:DELTA -281
 cols:NSPOTS 12
 cols:AXIS Y
 
-rows:START 666
+rows:START 520
 rows:DELTA 1126
 rows:NSPOTS 8
 rows:AXIS X
 
 tips:START 4700
-tips:DELTA -1000
-tips:NSPOTS 2
+tips:DELTA -385
+tips:NSPOTS 8
 tips:AXIS Z
-tips:SAFEZ 3700

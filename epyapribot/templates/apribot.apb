@@ -1,0 +1,9 @@
+spot:START 290
+spot:DELTA 4410
+spot:NSPOTS 4
+spot:AXIS Y
+
+tips:START 0
+tips:DELTA 102
+tips:NSPOT 340
+tips:AXIS V

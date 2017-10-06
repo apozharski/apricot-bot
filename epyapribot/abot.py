@@ -3,7 +3,7 @@ import serial, time, re
 XLIMIT = 9200
 YLIMIT = 13640
 ZLIMIT = 7000
-PLIMIT = 2000
+PLIMIT = 36000
 
 class TheBot(object):
     def __init__(self, fHome=True, *args, **kwds):
@@ -80,11 +80,16 @@ class TheBot(object):
         elif self.piston > v:
             print self.runcomm('pistondn', self.piston-v)
         self.piston = v
-    def goto(self, x=None, y=None, z=None, v=None, xyzv=None, order=None):
+    def goto(self, x=None, y=None, z=None, v=None, xyzv=None, order=None, safez=None):
         if xyzv is not None:
             x,y,z,v = xyzv
         if order is None or type(order) not in [str,unicode]:
-            order = 'xyzv'
+            order = 'zxyv'
+        if safez is not None:
+            self.zgoto(safez)
+            order = order.replace('z','')
         for c in order:
             if c in 'xyzv':
                 exec('self.'+c.replace('v','p')+'goto('+c+')')
+        if safez is not None:
+            self.zgoto(z)
