@@ -1,4 +1,4 @@
-import serial, time, re
+import serial, time, re, inspect, os
 
 XLIMIT = 9200
 YLIMIT = 13640
@@ -7,11 +7,12 @@ PLIMIT = 36000
 
 class TheBot(object):
     def __init__(self, fHome=True, *args, **kwds):
+        print os.path.abspath(os.path.dirname(inspect.getfile(inspect.getmodule(self))))
         serport = kwds.pop('serport','USB0')
         self.ser = serial.Serial('/dev/tty'+serport, 9600)
         time.sleep(1)
         ptrn_def = re.compile("^#define *COMM_([A-Z]*) *(\d*)")
-        self.hfile = kwds.pop('hfile', 'sercomm.h')
+        self.hfile = kwds.pop('hfile', os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(inspect.getmodule(self)))),'sercomm.h'))
         with open(self.hfile) as fhead:
             self.comms = dict([x.groups() for x in map(ptrn_def.match, fhead.readlines()) if x])
         if fHome:

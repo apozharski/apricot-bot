@@ -68,7 +68,7 @@ class ApriTargetZ(ApriTarget1D):
 
 class ApriTargetV(ApriTarget1D):
     def __init__(self, parent=None, dv=0, nv=35000, posv = 0, *args, **kwds):
-        super(ApriTargetX, self).__init__(parent, dv, nv, posv, *args, **kwds)
+        super(ApriTargetV, self).__init__(parent, dv, nv, posv, *args, **kwds)
     def set_xyzv(self):
         self.v = self.get_value()
 
@@ -85,7 +85,7 @@ def load_template(fname, parent=None, label=None):
         target = ApriTargetY
     elif axtype == 'Z':
         target = ApriTargetZ
-    elif axtype = 'V':
+    elif axtype == 'V':
         target = ApriTargetV
     else:
         raise(ValueError('Unknown target axis: '+axtype))
