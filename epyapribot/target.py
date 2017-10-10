@@ -27,6 +27,8 @@ class ApriTarget(object):
             if 'safez' in dir(self):
                 safez = max(safez, self.safez)
             return self.parent.get_safez(safez)
+    def set_safez(self, safez):
+        self.safez = safez
 
 class ApriTarget1D(ApriTarget):
     def __init__(self, parent=None, start=0, delta=0, nspots=1, pos = 0, *args, **kwds):

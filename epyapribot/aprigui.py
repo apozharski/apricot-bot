@@ -21,7 +21,7 @@ class ABotGUI(ABotFrame):
 
     def wxXMove(self, event):
         if self.RobotReady():
-            self.robot.xgoto(self.x_slider.GetValue())
+            self.robot.xgoto(self.spin_ctrl_x.GetValue())
         event.Skip()
 
     def wxYHome(self, event):
@@ -31,7 +31,7 @@ class ABotGUI(ABotFrame):
 
     def wxYMove(self, event):
         if self.RobotReady():
-            self.robot.ygoto(self.y_slider.GetValue())
+            self.robot.ygoto(self.spin_ctrl_y.GetValue())
         event.Skip()
 
     def wxZHome(self, event):
@@ -41,7 +41,7 @@ class ABotGUI(ABotFrame):
 
     def wxZMove(self, event):
         if self.RobotReady():
-            self.robot.zgoto(self.z_slider.GetValue())
+            self.robot.zgoto(self.spin_ctrl_z.GetValue())
         event.Skip()
 
     def wxPHomeUp(self, event):
@@ -56,7 +56,7 @@ class ABotGUI(ABotFrame):
 
     def wxPMove(self, event):
         if self.RobotReady():
-            self.robot.pgoto(self.p_slider.GetValue())
+            self.robot.pgoto(self.spin_ctrl_p.GetValue())
         event.Skip()
 
 

@@ -9,7 +9,7 @@ rows:NSPOTS 8
 rows:AXIS X
 
 tips:START 4700
-tips:DELTA -1000
-tips:NSPOTS 2
+tips:DELTA -100
+tips:NSPOTS 10
 tips:AXIS Z
 tips:SAFEZ 3700
