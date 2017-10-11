@@ -29,6 +29,8 @@ class ApriTarget(object):
             return self.parent.get_safez(safez)
     def set_safez(self, safez):
         self.safez = safez
+    def set_parent(self, parent):
+        self.parent = parent
 
 class ApriTarget1D(ApriTarget):
     def __init__(self, parent=None, start=0, delta=0, nspots=1, pos = 0, *args, **kwds):
@@ -97,3 +99,9 @@ def load_template(fname, parent=None, label=None):
     safez = int(defns.pop('safez',0))
     return target(parent, start, delta, nspots, safez=safez)
 
+class Plate:
+    def __init__(self, fname, robobase, *args, **kwds):
+        self.spots = load_template('../templates/apribot.apb',base,'spot')
+        self.rows = load_template(fname,self.spots,'rows')
+        self.cols = load_template(fname,self.rows,'cols')
+        self.tips = load_template(fname,self.cols,'tips')
