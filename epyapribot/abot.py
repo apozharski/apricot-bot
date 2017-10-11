@@ -7,7 +7,6 @@ PLIMIT = 36000
 
 class TheBot(object):
     def __init__(self, fHome=True, *args, **kwds):
-        print os.path.abspath(os.path.dirname(inspect.getfile(inspect.getmodule(self))))
         serport = kwds.pop('serport','USB0')
         self.ser = serial.Serial('/dev/tty'+serport, 9600)
         time.sleep(1)

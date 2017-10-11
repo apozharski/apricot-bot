@@ -17,9 +17,11 @@ class ApriTarget(object):
     def goto(self, bot=None):
         if bot is not None:
             bot.goto(xyzv=self.get_xyzv())
-    def safe_goto(self, bot=None):
+    def safe_goto(self, bot=None, safez=None):
         if bot is not None:
-            bot.goto(xyzv=self.get_xyzv(),safez=self.get_safez())
+            if safez is None:
+                safez = self.get_safez()
+            bot.goto(xyzv=self.get_xyzv(),safez=safez)
     def get_safez(self, safez=0):
         if self.parent is None:
             return safez
@@ -50,6 +52,10 @@ class ApriTarget1D(ApriTarget):
         self.set_pos(self.pos+ns, bot)
     def movedn(self, ns=1, bot=None):
         self.set_pos(self.pos-ns, bot)
+    def homeup(self, bot=None):
+        self.set_pos(self.nspots, bot)
+    def homedn(self, ns=1, bot=None):
+        self.set_pos(0, bot)
 
 class ApriTargetX(ApriTarget1D):
     def __init__(self, parent=None, dx=0, nx=1, posx = 0, *args, **kwds):
@@ -101,7 +107,7 @@ def load_template(fname, parent=None, label=None):
 
 class Plate:
     def __init__(self, fname, robobase, *args, **kwds):
-        self.spots = load_template('../templates/apribot.apb',base,'spot')
+        self.spots = load_template('../templates/apribot.apb',robobase,'spot')
         self.rows = load_template(fname,self.spots,'rows')
         self.cols = load_template(fname,self.rows,'cols')
         self.tips = load_template(fname,self.cols,'tips')
@@ -125,14 +131,34 @@ class Stage:
     def SetSpots(self, spots):
         for key, value in spots.iteritems():
             self.plates[key].SetSpot(value)
+        self.spotkeys = dict([(x[1].spots.pos,x[0]) for x in self.plates.items()])
     def SetRCT(self, key, values):
         r,c,t = values
         self.plates[key].SetRow(r)
         self.plates[key].SetColumn(c)
         self.plates[key].SetTip(t)
     def goto(self, key):
+        oldkey = [x for x in self.plates.keys() if self.plates[x].tips==self.piston.parent]
+        if len(oldkey) == 1:
+            oldkey = oldkey[0]
+            if oldkey == key:
+                safez = None
+            else:
+                f,l = sorted(set([self.plates[key].spots.pos,self.plates[oldkey].spots.pos]))
+                spotrange = range(f, l+1)
+                safez = min([self.plates[self.spotkeys[x]].tips.get_safez() for x in spotrange])
+        else:
+            safez = min([x.tips.get_safez() for x in self.plates.values()])
         self.__attach(key)
-        self.piston.goto(self.robot)
+        self.piston.safe_goto(self.robot, safez)
     def aspirate(self, key, value):
-        self.__attach(key)
+        self.goto(key)
         self.piston.moveup(value, self.robot)
+    def dispense(self, key, value):
+        self.goto(key)
+        self.piston.movedn(value, self.robot)
+    def empty (self, key):
+        self.goto(key)
+        self.robot.phomedn()
+        self.plates[key].tips.homeup()
+        self.piston.set_pos(0, self.robot)
