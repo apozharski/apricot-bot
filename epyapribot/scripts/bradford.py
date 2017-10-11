@@ -3,7 +3,7 @@
 import sys
 sys.path.append('../../epyapribot')
 from abot import TheBot
-from target import load_template, ApriTarget
+from target import load_template, ApriTarget, Plate
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 def main():
     headerhelp = \
@@ -21,59 +21,30 @@ def main():
     parser.add_argument('--sample-row', default=5, type=int, help='Column with the reagent')
     parser.add_argument('--tube-spot', default=3, type=int, help='Location of the sample tube holder')
 
-
     args = parser.parse_args()
-    args.plate_spot -= 1
-    args.tube_spot -= 1
-    args.control_col -= 1
-    args.reagent_spot -= 1
-    args.sample_col -= 1
-    args.reagent_col -= 1
-    args.bsa_row -= 1
-    args.sample_row -= 1
-    
 
     robot = TheBot()
     base = ApriTarget()
-    fname = '../templates/nunc96.apb'
-    pspots = load_template('../templates/apribot.apb',base,'spot')
-    prows = load_template(fname,pspots,'rows')
-    pcols = load_template(fname,prows,'cols')
-    ptips = load_template(fname,pcols,'tips')
-    ppiston = load_template('../templates/apribot.apb',ptips,'tips')
-    fname = '../templates/greiner_masterblock.apb'
-    rspots = load_template('../templates/apribot.apb',base,'spot')
-    rrows = load_template(fname,rspots,'rows')
-    rcols = load_template(fname,rrows,'cols')
-    rtips = load_template(fname,rcols,'tips')
-    rpiston = load_template('../templates/apribot.apb',rtips,'tips')
-    fname = '../templates/greiner_masterblock_small_tubes.apb'
-    tspots = load_template('../templates/apribot.apb',base,'spot')
-    trows = load_template(fname,tspots,'rows')
-    tcols = load_template(fname,trows,'cols')
-    ttips = load_template(fname,tcols,'tips')
-    tpiston = load_template('../templates/apribot.apb',ttips,'tips')
+    
+    plates = {
+        'test'      :   Plate('../templates/nunc96.apb', base),
+        'reagent'   :   Plate('../templates/greiner_masterblock.apb', base),
+        'sample'    :   Plate('../templates/greiner_masterblock_small_tubes.apb', base),
+        }
+    roboperator = Stage(plates, robot)
+    roboperator.SetSpots({'test': args.plate_spot, 'reagent': args.reagent_spot, 'sample': args.tube_spot})
 
-    pspots.set_pos(args.reagent_spot)
-    rspots.set_pos(args.plate_spot)
-    tspots.set_pos(args.tube_spot)
-    psafez = ptips.safez
-    safez = min(rtips.safez, ptips.safez)
-    rtips.set_safez(safez)
-    ptips.set_safez(safez)
+    roboperator.SetRCT('reagent', (1,args.reagent_col, 1))
+    roboperator.goto('reagent')
+    roboperator.aspirate(250)
+
+    sys.exit(0)
     
-    rtips.moveup(1)
-    rcols.set_pos(args.reagent_col)
-    
-    rpiston.safe_goto(robot)
-    rpiston.moveup(250,robot)
-    ppiston.moveup(250)
-    
-    pcols.set_pos(args.control_col)
+    pcols.set_pos(args.control_col-1)
     ptips.moveup(1)
     ppiston.safe_goto(robot)
     ppiston.movedn(125, robot)
-    pcols.set_pos(args.sample_col)
+    pcols.set_pos(args.sample_col-1)
     ptips.moveup(2)
     ppiston.safe_goto(robot)
     robot.phomedn()
@@ -88,13 +59,13 @@ def main():
 
     ptips.set_safez(psafez)
     ptips.set_pos(1)
-    pcols.set_pos(args.control_col)
+    pcols.set_pos(args.control_col-1)
     prows.set_pos(0)
     for i in range(8):
         ppiston.safe_goto(robot)
         ppiston.moveup(i+1, robot)
         prows.moveup()
-    pcols.set_pos(args.sample_col)
+    pcols.set_pos(args.sample_col-1)
     prows.set_pos(0)
     for i in range(8):
         ppiston.safe_goto(robot)
@@ -110,7 +81,7 @@ def main():
     ptips.set_pos(100)
     ppiston.set_pos(0, robot)
     tpiston.set_pos(0)
-    trows.set_pos(args.bsa_row)
+    trows.set_pos(args.bsa_row-1)
     ttips.movedn()
     tpiston.safe_goto(robot)
 
@@ -120,7 +91,7 @@ def main():
     
     ptips.set_pos(1)
     prows.set_pos(0)
-    pcols.set_pos(args.control_col,robot)
+    pcols.set_pos(args.control_col-1,robot)
     for i in range(8):
         ppiston.safe_goto(robot)
         ppiston.movedn(i+1, robot)
@@ -135,7 +106,7 @@ def main():
     ptips.set_pos(100)
     ppiston.set_pos(0, robot)
     tpiston.set_pos(0)
-    trows.set_pos(args.sample_row)
+    trows.set_pos(args.sample_row-1)
     ttips.movedn()
     tpiston.safe_goto(robot)
 
@@ -146,7 +117,7 @@ def main():
     
     ptips.set_pos(1)
     prows.set_pos(0)
-    pcols.set_pos(args.sample_col)
+    pcols.set_pos(args.sample_col-1)
     for i in range(8):
         ppiston.safe_goto(robot)
         ppiston.movedn(i+1, robot)

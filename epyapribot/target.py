@@ -105,3 +105,34 @@ class Plate:
         self.rows = load_template(fname,self.spots,'rows')
         self.cols = load_template(fname,self.rows,'cols')
         self.tips = load_template(fname,self.cols,'tips')
+    def SetSpot(self, nspot):
+        self.spots.set_pos(nspot-1)
+    def SetRow(self, nrow):
+        self.rows.set_pos(nrow-1)
+    def SetColumn(self, ncol):
+        self.cols.set_pos(ncol-1)
+    def SetTip(self, ntip):
+        self.tips.set_pos(ntip-1)
+
+class Stage:
+    def __init__(self, plates, robot, *args, **kwds):
+        self.plates = plates
+        self.robot = robot
+        self.piston = load_template('../templates/apribot.apb',None,'tips')
+        self.piston.goto(self.robot)
+    def __attach(self, key):
+        self.piston.set_parent(self.plates[key].tips)
+    def SetSpots(self, spots):
+        for key, value in spots.iteritems():
+            self.plates[key].SetSpot(value)
+    def SetRCT(self, key, values):
+        r,c,t = values
+        self.plates[key].SetRow(r)
+        self.plates[key].SetColumn(c)
+        self.plates[key].SetTip(t)
+    def goto(self, key):
+        self.__attach(key)
+        self.piston.goto(self.robot)
+    def aspirate(self, key, value):
+        self.__attach(key)
+        self.piston.moveup(value, self.robot)
