@@ -62,7 +62,6 @@ class ABotGUI(ABotFrame):
 
 class ABotApp(wx.App):
     def OnInit(self):
-        wx.InitAllImageHandlers()
         abotTopFrame = ABotGUI(None, -1, "")
         self.SetTopWindow(abotTopFrame)
         abotTopFrame.Show()

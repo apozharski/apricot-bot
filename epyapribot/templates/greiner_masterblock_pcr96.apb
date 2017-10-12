@@ -1,0 +1,15 @@
+cols:START 0
+cols:DELTA -281
+cols:NSPOTS 12
+cols:AXIS Y
+
+rows:START 520
+rows:DELTA 1140
+rows:NSPOTS 8
+rows:AXIS X
+
+tips:START 3400
+tips:DELTA -140
+tips:NSPOTS 10
+tips:AXIS Z
+tips:SAFEZ 2000
