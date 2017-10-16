@@ -1,4 +1,5 @@
 import re
+from abot import TheBot
 class ApriTarget(object):
     def __init__(self, parent=None, *args, **kwds):
         self.parent = parent
@@ -154,11 +155,29 @@ class Stage:
     def aspirate(self, key, value):
         self.goto(key)
         self.piston.moveup(value, self.robot)
+    def aspirateRCT(self, key, rct, value):
+        self.SetRCT(key, rct)
+        self.aspirate(key, value)
     def dispense(self, key, value):
         self.goto(key)
         self.piston.movedn(value, self.robot)
-    def empty (self, key):
+    def dispenseRCT(self, key, rct, value):
+        self.SetRCT(key, rct)
+        self.dispense(key, value)
+    def empty(self, key):
         self.goto(key)
         self.robot.phomedn()
         self.plates[key].tips.homeup()
         self.piston.set_pos(0, self.robot)
+    def emptyRCT(self, key, rct):
+        self.SetRCT(key, rct)
+        self.empty(key)
+    def home(self):
+        self.robot.home()
+
+def set_the_stage(plates):
+    robot = TheBot()
+    rbase = ApriTarget()
+    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase)) for x in plates.iteritems]), robot)
+    roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems]))
+    return roboperator
