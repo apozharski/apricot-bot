@@ -3,7 +3,7 @@
 import sys
 sys.path.append('../../epyapribot')
 from abot import TheBot
-from target import load_template, ApriTarget
+from target import set_the_stage
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 def main():
     headerhelp = \
@@ -11,31 +11,26 @@ def main():
 '''
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
                         description=headerhelp)
-    parser.add_argument('--clean-spot', default=1, help='Location of the clean water basin')
-    parser.add_argument('--rinse-spot', default=2, help='Location of the rinse water basin')
-    parser.add_argument('--ncyc', default=5, help='Number of cycles')
+    parser.add_argument('--clean-spot', default=1, type=int, help='Location of the clean water basin')
+    parser.add_argument('--rinse-spot', default=2, type=int, help='Location of the rinse water basin')
+    parser.add_argument('--ncyc', default=5, type=int, help='Number of cycles')
+    parser.add_argument('--vol', default=300, type=int, help='Volume to aspirate')
     args = parser.parse_args()
-    args.clean_spot -= 1
-    args.rinse_spot -= 1
+    
+    foo = raw_input("CHECK: Clean waterbasin in position "+str(args.clean_spot))
+    foo = raw_input("CHECK: Rinse waterbasin in position "+str(args.rinse_spot))
 
-    robot = TheBot()
-    base = ApriTarget()
-    fname = '../templates/wash.apb'
-    washspots = load_template('../templates/apribot.apb',base,'spot')
-    washrows = load_template(fname,washspots,'rows')
-    washcols = load_template(fname,washrows,'cols')
-    washtips = load_template(fname,washcols,'tips')
-    piston = load_template('../templates/apribot.apb',washtips,'tips')
+    plates = {
+        'clean'      :   ['../templates/wash.apb',args.clean_spot],
+        'rinse'   :   ['../templates/wash.apb',args.rinse_spot],
+        }
+    roboperator = set_the_stage(plates)
 
     for washcycle in range(args.ncyc):
-        washspots.set_pos(args.clean_spot)
-        piston.safe_goto(robot)
-        washtips.movedn()
-        piston.moveup(300, robot)
-        washspots.set_pos(args.rinse_spot)
-        piston.safe_goto(robot)
-        robot.phomedn()
-        piston.movedn(300)
+        roboperator.aspirateRCT('clean', (1, 1, 1), 250)
+        roboperator.emptyRCT('rinse', (1, 1, 2))
+    
+    roboperator.home()
 
 if __name__ == "__main__":
     main()
