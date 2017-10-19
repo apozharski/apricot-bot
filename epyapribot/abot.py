@@ -27,7 +27,7 @@ class TheBot(object):
         return str(self.comms.get(a.upper(),'')).ljust(4)+str(b).ljust(8)
     def runcomm(self, valComm, valParam=''):
         self.ser.write(self.makecomm(valComm, valParam))
-        return self.ser.readline()
+        return self.ser.readline().strip()
     def home(self):
         self.zhome()
         self.xhome()

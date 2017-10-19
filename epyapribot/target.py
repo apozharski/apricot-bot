@@ -1,4 +1,4 @@
-import re
+import re, sys
 from abot import TheBot
 class ApriTarget(object):
     def __init__(self, parent=None, *args, **kwds):
@@ -155,29 +155,57 @@ class Stage:
     def aspirate(self, key, value):
         self.goto(key)
         self.piston.moveup(value, self.robot)
-    def aspirateRCT(self, key, rct, value):
+    def aspirateRCT(self, key, rct, value, msg=None):
+        if msg is not None:
+            sys.stdout.write(msg)
         self.SetRCT(key, rct)
         self.aspirate(key, value)
+        if msg is not None:
+            sys.stdout.write('Done.\n')
     def dispense(self, key, value):
         self.goto(key)
         self.piston.movedn(value, self.robot)
-    def dispenseRCT(self, key, rct, value):
+    def dispenseRCT(self, key, rct, value, msg=None):
+        if msg is not None:
+            sys.stdout.write(msg)
         self.SetRCT(key, rct)
         self.dispense(key, value)
+        if msg is not None:
+            sys.stdout.write('Done.\n')
     def empty(self, key):
         self.goto(key)
-        self.robot.phomedn()
+        if self.robot is not None:
+            self.robot.phomedn()
         self.plates[key].tips.homeup()
         self.piston.set_pos(0, self.robot)
     def emptyRCT(self, key, rct):
+        sys.stdout.write('Empty the tips...')
         self.SetRCT(key, rct)
         self.empty(key)
+        sys.stdout.write('Done.\n')
+    def wash(self, key, value, ncyc=5):
+        self.empty(key)
+        for i in range(ncyc):
+            self.aspirate(key, value)
+            self.dispense(key, value)
+        self.plates[key].tips.homeup()
+    def washRCT(self, key, rct, value, ncyc=5):
+        sys.stdout.write('Wash the tips...')
+        self.SetRCT(key, rct)
+        self.wash(key, value, ncyc)
+        sys.stdout.write('Done.\n')
     def home(self):
-        self.robot.home()
+        sys.stdout.write('Homing the robot...\n')
+        if self.robot is not None:
+            self.robot.home()
+        sys.stdout.write('Done.\n')
 
-def set_the_stage(plates):
-    robot = TheBot()
+def set_the_stage(plates, dry_run=False):
+    if not dry_run:
+        robot = TheBot()
+    else:
+        robot = None
     rbase = ApriTarget()
-    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase)) for x in plates.iteritems]), robot)
-    roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems]))
+    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase)) for x in plates.iteritems()]), robot)
+    roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems()]))
     return roboperator
