@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
     parser.add_argument('--maxv', default=300, type=int, help='Maximum volume')
     parser.add_argument('--dry-run', action='store_true', help='Dry run.')
+    parser.add_argument('--manual-wash', action='store_true', help='Wash tips manually (may be faster)')
     
     args = parser.parse_args()
     
@@ -43,7 +44,7 @@ def main():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
         actRows = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
-        roboperator.aspirateRCT('stock', (stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, topRow, topRow+(actRows-1)*dispDir))
+        roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, topRow, topRow+(actRows-1)*dispDir))
         sys.stdout.write('Done.\n')
         for iRow in range(topRow,bottomRow+dispDir,dispDir):
             iVol = (iRow-topRow)*dispDir
@@ -51,11 +52,14 @@ def main():
                 ind = cumsum(vols[iVol:])<args.maxv
                 actRows += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                roboperator.aspirateRCT('stock', (stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
+                roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
             dispVolume = vols[iVol]
-            roboperator.dispenseRCT('plate', (iRow, 1, 1), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))
-        roboperator.emptyRCT('stock', (stockRow, 1, 8))
-        roboperator.washRCT('stock', (args.wash_row,1,4), args.maxv+args.xv)
+            roboperator.dispenseRCT('plate', (9-iRow, 1, 1), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))
+        roboperator.emptyRCT('stock', (9-stockRow, 1, 8))
+        if args.manual_wash:
+            foo = raw_input("Wash and/or replace the tips.  Hit ENTER when done.")
+        else:
+            roboperator.washRCT('stock', (9-args.wash_row,1,2), args.maxv+args.xv)
     
     roboperator.home()
 

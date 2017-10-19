@@ -184,10 +184,10 @@ class Stage:
         self.empty(key)
         sys.stdout.write('Done.\n')
     def wash(self, key, value, ncyc=5):
-        self.empty(key)
+        self.goto(key)
         for i in range(ncyc):
-            self.aspirate(key, value)
-            self.dispense(key, value)
+            self.piston.moveup(value, self.robot)
+            self.piston.movedn(value, self.robot)
         self.plates[key].tips.homeup()
     def washRCT(self, key, rct, value, ncyc=5):
         sys.stdout.write('Wash the tips...')
