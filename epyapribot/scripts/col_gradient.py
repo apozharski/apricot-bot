@@ -14,8 +14,8 @@ def main():
                         description=headerhelp)
     parser.add_argument('--plate-spot', default=2, type=int, help='Location of the plate')
     parser.add_argument('--stock-spot', default=1, type=int, help='Location of the stocks')
-    parser.add_argument('--wash-row', default=8, type=int, help='Row of the stock block for washing the tips')
-    parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockRow,topVolume,bottomVolume,topRow,bottomRow')
+    parser.add_argument('--wash-col', default=12, type=int, help='Column of the stock block for washing the tips')
+    parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockCol,firstVolume,lastVolume,firstCol,lastCol')
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
     parser.add_argument('--maxv', default=300, type=int, help='Maximum volume')
     parser.add_argument('--dry-run', action='store_true', help='Dry run.')
@@ -27,7 +27,7 @@ def main():
         sys.exit('No gradients are defined. Check your parameters.')
     foo = raw_input("CHECK: Target plate in position "+str(args.plate_spot))
     foo = raw_input("CHECK: Stock DeepWell block in position "+str(args.stock_spot))
-    foo = raw_input("CHECK: Wash row (%d) of the stock block is filled with water" % args.wash_row)
+    foo = raw_input("CHECK: Wash column (%d) of the stock block is filled with water" % args.wash_col)
 
     plates = {
         'plate'      :   ['../templates/nunc96.apb',args.plate_spot],
@@ -36,30 +36,37 @@ def main():
     roboperator = set_the_stage(plates, args.dry_run)
 
     for grad in args.grad:
-        stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
-        numRows = abs(topRow-bottomRow)+1
-        dispDir = sign(bottomRow-topRow+0.1).astype(int)
-        vols = around(topVolume + arange(numRows).astype(float)*(bottomVolume-topVolume)/(numRows-1)).astype(int)
+        stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
+        numCols = abs(firstCol-lastCol)+1
+        dispDir = sign(lastCol-firstCol+0.1).astype(int)
+        vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
         if (vols>args.maxv).any():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
-        actRows = sum(cumsum(vols)<args.maxv)
+        foo = raw_input("CHECK: Stock DeepWell block column %d is filled with %d ul of reagent." % (stockCol, sum(vols)+100))
+
+    for grad in args.grad:
+        stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
+        numCols = abs(firstCol-lastCol)+1
+        dispDir = sign(lastCol-firstCol+0.1).astype(int)
+        vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
+        actCols = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
-        roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, topRow, topRow+(actRows-1)*dispDir))
+        roboperator.aspirateRCT('stock', (1, stockCol, 2), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, firstCol, firstCol+(actCols-1)*dispDir))
         sys.stdout.write('Done.\n')
-        for iRow in range(topRow,bottomRow+dispDir,dispDir):
-            iVol = (iRow-topRow)*dispDir
-            if iRow == topRow+actRows*dispDir:
+        for iCol in range(firstCol,lastCol+dispDir,dispDir):
+            iVol = (iCol-firstCol)*dispDir
+            if iCol == firstCol+actCols*dispDir:
                 ind = cumsum(vols[iVol:])<args.maxv
-                actRows += sum(ind)
+                actCols += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
+                roboperator.aspirateRCT('stock', (1, stockCol, 2), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, iCol, firstCol+(actCols-1)*dispDir))
             dispVolume = vols[iVol]
-            roboperator.dispenseRCT('plate', (9-iRow, 1, 1), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))
-        roboperator.emptyRCT('stock', (9-stockRow, 1, 6))
+            roboperator.dispenseRCT('plate', (1, iCol, 1), dispVolume, 'Dispensing %d ul into column %d...' % (dispVolume, iCol))
+        roboperator.emptyRCT('stock', (1, stockCol, 6))
         if args.manual_wash:
             foo = raw_input("Wash and/or replace the tips.  Hit ENTER when done.")
         else:
-            roboperator.washRCT('stock', (9-args.wash_row,1,2), args.maxv+args.xv)
+            roboperator.washRCT('stock', (1,args.wash_col,2), args.maxv+args.xv)
     
     roboperator.home()
 
