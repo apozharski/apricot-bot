@@ -59,9 +59,9 @@ def main():
                 ind = cumsum(vols[iVol:])<args.maxv
                 actCols += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                roboperator.aspirateRCT('stock', (1, stockCol, 2), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, iCol, firstCol+(actCols-1)*dispDir))
+                roboperator.aspirateRCT('stock', (1, stockCol, 1), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, iCol, firstCol+(actCols-1)*dispDir))
             dispVolume = vols[iVol]
-            roboperator.dispenseRCT('plate', (1, iCol, 1), dispVolume, 'Dispensing %d ul into column %d...' % (dispVolume, iCol))
+            roboperator.dispenseRCT('plate', (1, iCol, 2), dispVolume, 'Dispensing %d ul into column %d...' % (dispVolume, iCol))
         roboperator.emptyRCT('stock', (1, stockCol, 6))
         if args.manual_wash:
             foo = raw_input("Wash and/or replace the tips.  Hit ENTER when done.")
