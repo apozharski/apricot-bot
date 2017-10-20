@@ -71,11 +71,16 @@ class ApriTargetY(ApriTarget1D):
         self.y = self.get_value()
 
 class ApriTargetZ(ApriTarget1D):
-    def __init__(self, parent=None, dz=0, nz=1, posz = 0, safez=0, *args, **kwds):
+    def __init__(self, parent=None, dz=0, nz=1, posz = 0, safez=0, vdelta=0, *args, **kwds):
         super(ApriTargetZ, self).__init__(parent, dz, nz, posz, *args, **kwds)
         self.safez = safez
     def set_xyzv(self):
         self.z = self.get_value()
+    def good_vpos(self, vrem):
+        if self.vdelta:
+            return 1+(10+vrem)/self.vdelta
+        else:
+            return 1
 
 class ApriTargetV(ApriTarget1D):
     def __init__(self, parent=None, dv=0, nv=35000, posv = 0, *args, **kwds):
@@ -104,7 +109,8 @@ def load_template(fname, parent=None, label=None):
     delta = int(defns.pop('delta',0))
     nspots = int(defns.pop('nspots',1))
     safez = int(defns.pop('safez',0))
-    return target(parent, start, delta, nspots, safez=safez)
+    vdelta = int(defns.pop('vdelta',0))
+    return target(parent, start, delta, nspots, safez=safez, vdelta=vdelta)
 
 class Plate:
     def __init__(self, fname, robobase, *args, **kwds):
@@ -120,6 +126,10 @@ class Plate:
         self.cols.set_pos(ncol-1)
     def SetTip(self, ntip):
         self.tips.set_pos(ntip-1)
+    def good_vpos(self, vrem):
+        return self.tips.good_vpos(vrem)
+    def tipup(self):
+        self.tips.homeup()
 
 class Stage:
     def __init__(self, plates, robot, *args, **kwds):
@@ -176,7 +186,7 @@ class Stage:
         self.goto(key)
         if self.robot is not None:
             self.robot.phomedn()
-        self.plates[key].tips.homeup()
+        self.plates[key].tipup()
         self.piston.set_pos(0, self.robot)
     def emptyRCT(self, key, rct):
         sys.stdout.write('Empty the tips...')
@@ -188,7 +198,7 @@ class Stage:
         for i in range(ncyc):
             self.piston.moveup(value, self.robot)
             self.piston.movedn(value, self.robot)
-        self.plates[key].tips.homeup()
+        self.plates[key].tipup()
     def washRCT(self, key, rct, value, ncyc=5):
         sys.stdout.write('Wash the tips...')
         self.SetRCT(key, rct)
@@ -199,6 +209,8 @@ class Stage:
         if self.robot is not None:
             self.robot.home()
         sys.stdout.write('Done.\n')
+    def good_vpos(self, key, vrem):
+        return self.plates[key].good_vpos(vrem)
 
 def set_the_stage(plates, dry_run=False):
     if not dry_run:

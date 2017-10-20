@@ -51,7 +51,8 @@ def main():
         vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
         actCols = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
-        roboperator.aspirateRCT('stock', (1, stockCol, 2), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, firstCol, firstCol+(actCols-1)*dispDir))
+        tipstop = roboperator.good_vpos('stock', sum(vols[actCols:]))
+        roboperator.aspirateRCT('stock', (1, stockCol, tipstop), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, firstCol, firstCol+(actCols-1)*dispDir))
         sys.stdout.write('Done.\n')
         for iCol in range(firstCol,lastCol+dispDir,dispDir):
             iVol = (iCol-firstCol)*dispDir
@@ -59,7 +60,8 @@ def main():
                 ind = cumsum(vols[iVol:])<args.maxv
                 actCols += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                roboperator.aspirateRCT('stock', (1, stockCol, 1), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, iCol, firstCol+(actCols-1)*dispDir))
+                tipstop = roboperator.good_vpos('stock', sum(vols[actCols:]))
+                roboperator.aspirateRCT('stock', (1, stockCol, tipstop), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, iCol, firstCol+(actCols-1)*dispDir))
             dispVolume = vols[iVol]
             roboperator.dispenseRCT('plate', (1, iCol, 2), dispVolume, 'Dispensing %d ul into column %d...' % (dispVolume, iCol))
         roboperator.emptyRCT('stock', (1, stockCol, 6))
