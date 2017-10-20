@@ -1,9 +1,19 @@
-import serial, time, re, inspect, os
+import serial, time, re, inspect, os, sys
 
 XLIMIT = 9200
 YLIMIT = 13640
 ZLIMIT = 7000
 PLIMIT = 36000
+
+LIMIT_ERROR 2
+
+def limit_error(value, value_limit, axletter):
+    if value < 0:
+        rsn = axletter+'-HOME'
+    if value > value_limit:
+        rsn = axletter+'-LIMIT'
+    sys.stderr.write('WARNING: Requested move beyond '+rsn+' denied.')
+    return LIMIT_ERROR
 
 class TheBot(object):
     def __init__(self, fHome=True, *args, **kwds):
@@ -44,7 +54,7 @@ class TheBot(object):
         self.z = 0
     def xgoto(self, x):
         if x < 0 or x > XLIMIT or x is None:
-            return
+            return limit_error(x, XLIMIT, 'X')
         if self.x < x:
             print self.runcomm('xfwd', x-self.x)
         elif self.x > x:
@@ -52,7 +62,7 @@ class TheBot(object):
         self.x = x
     def ygoto(self, y):
         if y < 0 or y > YLIMIT or y is None:
-            return
+            return limit_error(y, YLIMIT, 'Y')
         if self.y < y:
             print self.runcomm('yfwd', y-self.y)
         elif self.y > y:
@@ -60,7 +70,7 @@ class TheBot(object):
         self.y = y
     def zgoto(self, z):
         if z < 0 or z > ZLIMIT or z is None:
-            return
+            return limit_error(z, ZLIMIT, 'Z')
         if self.z < z:
             print self.runcomm('zfwd', z-self.z)
         elif self.z > z:
@@ -73,8 +83,8 @@ class TheBot(object):
         print self.runcomm('phomeup')
         self.piston = PLIMIT
     def pgoto(self, v):
-        if v < 0 or v is None:
-            return
+        if v < 0 or v > PLIMIT or v is None:
+            return limit_error(v, PLIMIT, 'P')
         if self.piston < v:
             print self.runcomm('pistonup', v-self.piston)
         elif self.piston > v:

@@ -44,7 +44,7 @@ def main():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
         actRows = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
-        roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, topRow, topRow+(actRows-1)*dispDir))
+        roboperator.aspirateRCT('stock', (9-stockRow, 1, 1), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, topRow, topRow+(actRows-1)*dispDir))
         sys.stdout.write('Done.\n')
         for iRow in range(topRow,bottomRow+dispDir,dispDir):
             iVol = (iRow-topRow)*dispDir
@@ -52,9 +52,9 @@ def main():
                 ind = cumsum(vols[iVol:])<args.maxv
                 actRows += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                roboperator.aspirateRCT('stock', (9-stockRow, 1, 2), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
+                roboperator.aspirateRCT('stock', (9-stockRow, 1, 1), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
             dispVolume = vols[iVol]
-            roboperator.dispenseRCT('plate', (9-iRow, 1, 1), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))
+            roboperator.dispenseRCT('plate', (9-iRow, 1, 2), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))
         roboperator.emptyRCT('stock', (9-stockRow, 1, 6))
         if args.manual_wash:
             foo = raw_input("Wash and/or replace the tips.  Hit ENTER when done.")
