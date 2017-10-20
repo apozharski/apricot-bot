@@ -182,9 +182,10 @@ class Stage:
         if msg is not None:
             sys.stdout.write(msg)
         self.SetRCT(key, rct)
-        self.dispense(key, value)
-        if dip:
-            self.tipdip(key)
+        if value > 0:
+            self.dispense(key, value)
+            if dip:
+                self.__tipdip(key)
         if msg is not None:
             sys.stdout.write('Done.\n')
     def empty(self, key):
@@ -218,12 +219,13 @@ class Stage:
         sys.stdout.write('Done.\n')
     def good_vpos(self, key, vrem):
         return self.plates[key].good_vpos(vrem)
-    def tipdip(self, key):
+    def __tipdip(self, key):
         tipos = self.plates[key].tips.pos
         self.plates[key].tipdown()
-        self.goto(key)
+        self.__attach(key)
+        self.piston.goto(self.robot)
         self.plates[key].tips.set_pos(tipos)
-        self.goto(key)
+        self.piston.goto(self.robot)
 
 def set_the_stage(plates, dry_run=False):
     if not dry_run:

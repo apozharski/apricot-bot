@@ -44,52 +44,65 @@ class TheBot(object):
         self.yhome()
         self.phomedn()
     def xhome(self):
-        print self.runcomm('xhome')
+        retcode = self.runcomm('xhome')
         self.x = 0
+        return retcode
     def yhome(self):
-        print self.runcomm('yhome')
+        retcode = self.runcomm('yhome')
         self.y = 0
+        return retcode
     def zhome(self):
-        print self.runcomm('zhome')
+        retcode = self.runcomm('zhome')
         self.z = 0
+        return retcode
     def xgoto(self, x):
+        retcode = None
         if x < 0 or x > XLIMIT or x is None:
             return limit_error(x, XLIMIT, 'X')
         if self.x < x:
-            print self.runcomm('xfwd', x-self.x)
+            retcode = self.runcomm('xfwd', x-self.x)
         elif self.x > x:
-            print self.runcomm('xback', self.x-x)
+            retcode = self.runcomm('xback', self.x-x)
         self.x = x
+        return retcode
     def ygoto(self, y):
+        retcode = None
         if y < 0 or y > YLIMIT or y is None:
             return limit_error(y, YLIMIT, 'Y')
         if self.y < y:
-            print self.runcomm('yfwd', y-self.y)
+            retcode = self.runcomm('yfwd', y-self.y)
         elif self.y > y:
-            print self.runcomm('yback', self.y-y)
+            retcode = self.runcomm('yback', self.y-y)
         self.y = y
+        return retcode
     def zgoto(self, z):
+        retcode = None
         if z < 0 or z > ZLIMIT or z is None:
             return limit_error(z, ZLIMIT, 'Z')
         if self.z < z:
-            print self.runcomm('zfwd', z-self.z)
+            retcode = self.runcomm('zfwd', z-self.z)
         elif self.z > z:
-            print self.runcomm('zback', self.z-z)
+            retcode = self.runcomm('zback', self.z-z)
         self.z = z
+        return retcode
     def phomedn(self):
-        print self.runcomm('phomedn')
+        retcode = self.runcomm('phomedn')
         self.piston = 0
+        return retcode
     def phomeup(self):
-        print self.runcomm('phomeup')
+        retcode = self.runcomm('phomeup')
         self.piston = PLIMIT
+        return retcode
     def pgoto(self, v):
+        retcode = None
         if v < 0 or v > PLIMIT or v is None:
             return limit_error(v, PLIMIT, 'P')
         if self.piston < v:
-            print self.runcomm('pistonup', v-self.piston)
+            retcode = self.runcomm('pistonup', v-self.piston)
         elif self.piston > v:
-            print self.runcomm('pistondn', self.piston-v)
+            retcode = self.runcomm('pistondn', self.piston-v)
         self.piston = v
+        return retcode
     def goto(self, x=None, y=None, z=None, v=None, xyzv=None, order=None, safez=None):
         if xyzv is not None:
             x,y,z,v = xyzv

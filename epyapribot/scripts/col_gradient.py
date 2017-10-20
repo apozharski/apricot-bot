@@ -18,6 +18,7 @@ def main():
     parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockCol,firstVolume,lastVolume,firstCol,lastCol')
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
     parser.add_argument('--maxv', default=300, type=int, help='Maximum volume')
+    parser.add_argument('--cush-vol', default=50, type=int, help='Cushion volume')
     parser.add_argument('--dry-run', action='store_true', help='Dry run.')
     parser.add_argument('--manual-wash', action='store_true', help='Wash tips manually (may be faster)')
     
@@ -33,7 +34,6 @@ def main():
         'plate'      :   ['../templates/nunc96.apb',args.plate_spot],
         'stock'   :   ['../templates/greiner_masterblock.apb',args.stock_spot],
         }
-    roboperator = set_the_stage(plates, args.dry_run)
 
     for grad in args.grad:
         stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
@@ -42,7 +42,9 @@ def main():
         vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
         if (vols>args.maxv).any():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
-        foo = raw_input("CHECK: Stock DeepWell block column %d is filled with %d ul of reagent." % (stockCol, sum(vols)+100))
+        foo = raw_input("CHECK: Stock DeepWell block column %d is filled with %d ul of reagent." % (stockCol, sum(vols)+args.cush_vol))
+
+    roboperator = set_the_stage(plates, args.dry_run)
 
     for grad in args.grad:
         stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
