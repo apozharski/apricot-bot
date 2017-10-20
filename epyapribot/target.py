@@ -184,7 +184,7 @@ class Stage:
         self.SetRCT(key, rct)
         self.dispense(key, value)
         if dip:
-            self.plates[key].tipdown(self.robot)
+            self.tipdip(key)
         if msg is not None:
             sys.stdout.write('Done.\n')
     def empty(self, key):
@@ -222,7 +222,7 @@ class Stage:
         tipos = self.plates[key].tips.pos
         self.plates[key].tipdown()
         self.goto(key)
-        self.plates[key].set_pos(tipos)
+        self.plates[key].tips.set_pos(tipos)
         self.goto(key)
 
 def set_the_stage(plates, dry_run=False):
