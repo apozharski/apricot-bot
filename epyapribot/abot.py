@@ -5,7 +5,7 @@ YLIMIT = 13640
 ZLIMIT = 7000
 PLIMIT = 36000
 
-LIMIT_ERROR 2
+LIMIT_ERROR = 2
 
 def limit_error(value, value_limit, axletter):
     if value < 0:
