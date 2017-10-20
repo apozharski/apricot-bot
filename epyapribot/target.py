@@ -53,10 +53,6 @@ class ApriTarget1D(ApriTarget):
         self.set_pos(self.pos+ns, bot)
     def movedn(self, ns=1, bot=None):
         self.set_pos(self.pos-ns, bot)
-    def homeup(self, bot=None):
-        self.set_pos(self.nspots, bot)
-    def homedn(self, ns=1, bot=None):
-        self.set_pos(0, bot)
 
 class ApriTargetX(ApriTarget1D):
     def __init__(self, parent=None, dx=0, nx=1, posx = 0, *args, **kwds):
@@ -74,6 +70,7 @@ class ApriTargetZ(ApriTarget1D):
     def __init__(self, parent=None, dz=0, nz=1, posz = 0, safez=0, vdelta=0, *args, **kwds):
         super(ApriTargetZ, self).__init__(parent, dz, nz, posz, *args, **kwds)
         self.safez = safez
+        self.vdelta = vdelta
     def set_xyzv(self):
         self.z = self.get_value()
     def good_vpos(self, vrem):
@@ -81,6 +78,10 @@ class ApriTargetZ(ApriTarget1D):
             return 1+(10+vrem)/self.vdelta
         else:
             return 1
+    def homeup(self, bot=None):
+        self.set_pos(self.nspots, bot)
+    def homedn(self, bot=None):
+        self.set_pos(0, bot)
 
 class ApriTargetV(ApriTarget1D):
     def __init__(self, parent=None, dv=0, nv=35000, posv = 0, *args, **kwds):
@@ -128,8 +129,10 @@ class Plate:
         self.tips.set_pos(ntip-1)
     def good_vpos(self, vrem):
         return self.tips.good_vpos(vrem)
-    def tipup(self):
-        self.tips.homeup()
+    def tipup(self, bot=None):
+        self.tips.homeup(bot)
+    def tipdown(self, bot=None):
+        self.tips.homedn(bot)
 
 class Stage:
     def __init__(self, plates, robot, *args, **kwds):
@@ -175,11 +178,13 @@ class Stage:
     def dispense(self, key, value):
         self.goto(key)
         self.piston.movedn(value, self.robot)
-    def dispenseRCT(self, key, rct, value, msg=None):
+    def dispenseRCT(self, key, rct, value, msg=None, dip=True):
         if msg is not None:
             sys.stdout.write(msg)
         self.SetRCT(key, rct)
         self.dispense(key, value)
+        if dip:
+            self.plates[key].tipdown(self.robot)
         if msg is not None:
             sys.stdout.write('Done.\n')
     def empty(self, key):
@@ -196,11 +201,13 @@ class Stage:
     def wash(self, key, value, ncyc=5):
         self.goto(key)
         for i in range(ncyc):
+            sys.stdout.write('Wash cycle #'+str(i+1)+'\n')
             self.piston.moveup(value, self.robot)
             self.piston.movedn(value, self.robot)
         self.plates[key].tipup()
+        self.goto(key)
     def washRCT(self, key, rct, value, ncyc=5):
-        sys.stdout.write('Wash the tips...')
+        sys.stdout.write('Wash the tips...\n')
         self.SetRCT(key, rct)
         self.wash(key, value, ncyc)
         sys.stdout.write('Done.\n')
@@ -211,6 +218,12 @@ class Stage:
         sys.stdout.write('Done.\n')
     def good_vpos(self, key, vrem):
         return self.plates[key].good_vpos(vrem)
+    def tipdip(self, key):
+        tipos = self.plates[key].tips.pos
+        self.plates[key].tipdown()
+        self.goto(key)
+        self.plates[key].set_pos(tipos)
+        self.goto(key)
 
 def set_the_stage(plates, dry_run=False):
     if not dry_run:

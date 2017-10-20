@@ -12,8 +12,8 @@ def main():
 '''
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
                         description=headerhelp)
-    parser.add_argument('--plate-spot', default=2, type=int, help='Location of the plate')
-    parser.add_argument('--stock-spot', default=1, type=int, help='Location of the stocks')
+    parser.add_argument('--plate-spot', default=3, type=int, help='Location of the plate')
+    parser.add_argument('--stock-spot', default=2, type=int, help='Location of the stocks')
     parser.add_argument('--wash-row', default=8, type=int, help='Row of the stock block for washing the tips')
     parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockRow,topVolume,bottomVolume,topRow,bottomRow')
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
