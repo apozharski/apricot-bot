@@ -5,7 +5,7 @@ sys.path.append('../../epyapribot')
 from abot import TheBot
 from target import set_the_stage
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from scipy import cumsum, arange, around, sign
+from scipy import cumsum, arange, around, sign, ones
 def main():
     headerhelp = \
 '''
@@ -35,14 +35,20 @@ def main():
         'stock'   :   ['../templates/greiner_masterblock.apb',args.stock_spot],
         }
 
+    reqvols = {}
     for grad in args.grad:
         stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
         numRows = abs(topRow-bottomRow)+1
         dispDir = sign(bottomRow-topRow+0.1).astype(int)
-        vols = around(topVolume + arange(numRows).astype(float)*(bottomVolume-topVolume)/(numRows-1)).astype(int)
+        if numRows>1:
+            vols = around(topVolume + arange(numRows).astype(float)*(bottomVolume-topVolume)/(numRows-1)).astype(int)
+        else:
+            vols = topVolume*ones(1).astype(int)
         if (vols>args.maxv).any():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
-        foo = raw_input("CHECK: Stock DeepWell block row %d is filled with %d ul of reagent." % (stockRow, sum(vols)+args.cush_vol))
+        reqvols[stockRow] = reqvols.get(stockRow,0)+sum(vols)+args.xv
+    for key, value in reqvols.iteritems():
+        foo = raw_input("CHECK: Stock DeepWell block row %d is filled with %d ul of reagent." % (key, value+args.cush_vol))
 
     roboperator = set_the_stage(plates, args.dry_run)
 
@@ -50,7 +56,11 @@ def main():
         stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
         numRows = abs(topRow-bottomRow)+1
         dispDir = sign(bottomRow-topRow+0.1).astype(int)
-        vols = around(topVolume + arange(numRows).astype(float)*(bottomVolume-topVolume)/(numRows-1)).astype(int)
+        if numRows>1:
+            vols = around(topVolume + arange(numRows).astype(float)*(bottomVolume-topVolume)/(numRows-1)).astype(int)
+        else:
+            vols = topVolume*ones(1).astype(int)
+        reqvols[stockRow] -= sum(vols)+args.xv
         actRows = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
         tipstop = roboperator.good_vpos('stock', sum(vols[actRows:]))
@@ -62,7 +72,7 @@ def main():
                 ind = cumsum(vols[iVol:])<args.maxv
                 actRows += sum(ind)
                 aspVolume = sum(vols[iVol:][ind])
-                tipstop = roboperator.good_vpos('stock', sum(vols[actRows:]))
+                tipstop = roboperator.good_vpos('stock', sum(vols[actRows:])+reqvols[stockRow])
                 roboperator.aspirateRCT('stock', (9-stockRow, 1, tipstop), aspVolume, 'Aspirating %d ul to dispense rows %d to %d...' % (aspVolume, iRow, topRow+(actRows-1)*dispDir))
             dispVolume = vols[iVol]
             roboperator.dispenseRCT('plate', (9-iRow, 1, 2), dispVolume, 'Dispensing %d ul into row %d...' % (dispVolume, iRow))

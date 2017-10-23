@@ -5,7 +5,7 @@ sys.path.append('../../epyapribot')
 from abot import TheBot
 from target import set_the_stage
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from scipy import cumsum, arange, around, sign, ones
+from scipy import cumsum, arange, around, sign, ones, array
 def main():
     headerhelp = \
 '''
@@ -15,7 +15,7 @@ def main():
     parser.add_argument('--plate-spot', default=3, type=int, help='Location of the plate')
     parser.add_argument('--stock-spot', default=2, type=int, help='Location of the stocks')
     parser.add_argument('--wash-col', default=12, type=int, help='Column of the stock block for washing the tips')
-    parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockCol,firstVolume,lastVolume,firstCol,lastCol')
+    parser.add_argument('-v', '--vols', action='append', help='VOlume definitions: stockCol,firstCol,lastCol,V1,V2,...')
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
     parser.add_argument('--maxv', default=300, type=int, help='Maximum volume')
     parser.add_argument('--cush-vol', default=50, type=int, help='Cushion volume')
@@ -24,7 +24,7 @@ def main():
     
     args = parser.parse_args()
     
-    if args.grad is None:
+    if args.vols is None:
         sys.exit('No gradients are defined. Check your parameters.')
     foo = raw_input("CHECK: Target plate in position "+str(args.plate_spot))
     foo = raw_input("CHECK: Stock DeepWell block in position "+str(args.stock_spot))
@@ -36,14 +36,11 @@ def main():
         }
 
     reqvols = {}
-    for grad in args.grad:
-        stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
+    for volset in args.vols:
+        stockCol,firstCol,lastCol = map(int, volset.split(',')[:3])
         numCols = abs(firstCol-lastCol)+1
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
-        if numCols>1:
-            vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
-        else:
-            vols = firstVolume*ones(1).astype(int)
+        vols = array(map(int, volset.split(',')[3:]))
         if (vols>args.maxv).any():
             sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
         reqvols[stockCol] = reqvols.get(stockCol,0)+sum(vols)+args.xv
@@ -52,14 +49,11 @@ def main():
 
     roboperator = set_the_stage(plates, args.dry_run)
 
-    for grad in args.grad:
-        stockCol,firstVolume,lastVolume,firstCol,lastCol = map(int, grad.split(','))
+    for grad in args.vols:
+        stockCol,firstCol,lastCol = map(int, volset.split(',')[:3])
         numCols = abs(firstCol-lastCol)+1
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
-        if numCols>1:
-            vols = around(firstVolume + arange(numCols).astype(float)*(lastVolume-firstVolume)/(numCols-1)).astype(int)
-        else:
-            vols = firstVolume*ones(1).astype(int)
+        vols = array(map(int, volset.split(',')[3:]))
         reqvols[stockCol] -= sum(vols)+args.xv
         actCols = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
