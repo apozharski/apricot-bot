@@ -25,7 +25,7 @@ def main():
     args = parser.parse_args()
     
     if args.vols is None:
-        sys.exit('No gradients are defined. Check your parameters.')
+        sys.exit('No volume sets are defined. Check your parameters.')
     foo = raw_input("CHECK: Target plate in position "+str(args.plate_spot))
     foo = raw_input("CHECK: Stock DeepWell block in position "+str(args.stock_spot))
     foo = raw_input("CHECK: Wash column (%d) of the stock block is filled with water" % args.wash_col)
@@ -42,14 +42,14 @@ def main():
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
         vols = array(map(int, volset.split(',')[3:]))
         if (vols>args.maxv).any():
-            sys.exit('Aspirated volume limit exceeded for gradient "'+grad+'".  Check your parameters.')
+            sys.exit('Aspirated volume limit exceeded for volume set "'+volset+'".  Check your parameters.')
         reqvols[stockCol] = reqvols.get(stockCol,0)+sum(vols)+args.xv
     for key, value in reqvols.iteritems():
         foo = raw_input("CHECK: Stock DeepWell block column %d is filled with %d ul of reagent." % (key, value+args.cush_vol))
 
     roboperator = set_the_stage(plates, args.dry_run)
 
-    for grad in args.vols:
+    for volset in args.vols:
         stockCol,firstCol,lastCol = map(int, volset.split(',')[:3])
         numCols = abs(firstCol-lastCol)+1
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
