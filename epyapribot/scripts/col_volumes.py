@@ -59,7 +59,6 @@ def main():
         vols = map(int, volset.split(',')[3:])
         if len(vols) == 1:
             vols = ones(numCols).astype(int)*vols[0]
-            print vols
         else:
             vols = array(vols)
         reqvols[stockCol] -= sum(vols)+args.xv
