@@ -40,7 +40,11 @@ def main():
         stockCol,firstCol,lastCol = map(int, volset.split(',')[:3])
         numCols = abs(firstCol-lastCol)+1
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
-        vols = array(map(int, volset.split(',')[3:]))
+        vols = map(int, volset.split(',')[3:])
+        if len(vols) == 1:
+            vols = ones(numCols).astype(int)*vols[0]
+        else:
+            vols = array(vols)
         if (vols>args.maxv).any():
             sys.exit('Aspirated volume limit exceeded for volume set "'+volset+'".  Check your parameters.')
         reqvols[stockCol] = reqvols.get(stockCol,0)+sum(vols)+args.xv
@@ -53,7 +57,12 @@ def main():
         stockCol,firstCol,lastCol = map(int, volset.split(',')[:3])
         numCols = abs(firstCol-lastCol)+1
         dispDir = sign(lastCol-firstCol+0.1).astype(int)
-        vols = array(map(int, volset.split(',')[3:]))
+        vols = map(int, volset.split(',')[3:])
+        if len(vols) == 1:
+            vols = ones(numCols).astype(int)*vols[0]
+            print vols
+        else:
+            vols = array(vols)
         reqvols[stockCol] -= sum(vols)+args.xv
         actCols = sum(cumsum(vols)<args.maxv)
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
