@@ -2,7 +2,6 @@
 
 import sys
 sys.path.append('../../epyapribot')
-from abot import TheBot
 from target import set_the_stage
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from scipy import cumsum, arange, around, sign, ones, array
@@ -68,7 +67,6 @@ def main():
         aspVolume = sum(vols[cumsum(vols)<args.maxv])+args.xv
         tipstop = roboperator.good_vpos('stock', sum(vols[actCols:])+reqvols[stockCol])
         roboperator.aspirateRCT('stock', (1, stockCol, tipstop), aspVolume, 'Aspirating %d ul to dispense columns %d to %d...' % (aspVolume, firstCol, firstCol+(actCols-1)*dispDir))
-        sys.stdout.write('Done.\n')
         for iCol in range(firstCol,lastCol+dispDir,dispDir):
             iVol = (iCol-firstCol)*dispDir
             if iCol == firstCol+actCols*dispDir:
