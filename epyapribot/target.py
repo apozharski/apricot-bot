@@ -120,8 +120,8 @@ def name_template(fname):
     return tname if tname else 'Undefined'
 
 class Plate:
-    def __init__(self, fname, robobase, *args, **kwds):
-        self.spots = load_template('../templates/apribot.apb',robobase,'spot')
+    def __init__(self, fname, robobase, robasename, *args, **kwds):
+        self.spots = load_template(robasename,robobase,'spot')
         self.rows = load_template(fname,self.spots,'rows')
         self.cols = load_template(fname,self.rows,'cols')
         self.tips = load_template(fname,self.cols,'tips')
@@ -144,13 +144,14 @@ class Stage:
     def __init__(self, plates, robot, *args, **kwds):
         self.plates = plates
         self.robot = robot
-        self.piston = load_template('../templates/apribot.apb',None,'tips')
+        self.piston = load_template(plates['base'],None,'tips')
         self.piston.goto(self.robot)
     def __attach(self, key):
         self.piston.set_parent(self.plates[key].tips)
     def SetSpots(self, spots):
         for key, value in spots.iteritems():
-            self.plates[key].SetSpot(value)
+            if value:
+                self.plates[key].SetSpot(value)
         self.spotkeys = dict([(x[1].spots.pos,x[0]) for x in self.plates.items()])
     def SetRCT(self, key, values):
         r,c,t = values
@@ -242,6 +243,7 @@ def set_the_stage(plates, dry_run=False):
     else:
         robot = None
     rbase = ApriTarget()
-    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase)) for x in plates.iteritems()]), robot)
+    rbname = [x[0] for x in plates if x[1]==0][0]
+    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase,rbname)) for x in plates.iteritems()]), robot)
     roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems()]))
     return roboperator

@@ -31,6 +31,7 @@ def main():
     foo = raw_input("CHECK: Wash column (%d) of the stock block is filled with water" % args.wash_col)
 
     plates = {
+        'robobase'  :   ['../templates/apribot.apb', 0],
         'plate'      :   ['../templates/nunc96.apb',args.plate_spot],
         'stock'   :   ['../templates/greiner_masterblock.apb',args.stock_spot],
         }

@@ -21,6 +21,7 @@ def main():
     foo = raw_input("CHECK: Rinse waterbasin in position "+str(args.rinse_spot))
 
     plates = {
+        'robobase'  :   ['../templates/apribot.apb', 0],
         'clean'      :   ['../templates/wash.apb',args.clean_spot],
         'rinse'   :   ['../templates/wash.apb',args.rinse_spot],
         }

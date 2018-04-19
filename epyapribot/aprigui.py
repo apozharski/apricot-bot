@@ -10,7 +10,7 @@ from target import set_the_stage, name_template
 class ABotGUI(ABotFrame):
     def __init__(self, *args, **kwds):
         ABotFrame.__init__(self, *args, **kwds)
-        self.plates = {}
+        self.plates = {'robobase'  :   ['templates/apribot.apb', 0]}
         self.roboperator = self.SetRobOperator()
     def SetRobOperator(self, plates=None):
         plates = self.plates if plates is None else plates
