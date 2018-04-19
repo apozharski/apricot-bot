@@ -32,6 +32,7 @@ def main():
     foo = raw_input("Hit Enter to start")
 
     plates = {
+        'spots'     :   ['../templates/apribot.apb', 0],
         'test'      :   ['../templates/nunc96.apb',args.plate_spot],
         'reagent'   :   ['../templates/greiner_masterblock.apb',args.reagent_spot],
         'sample'    :   ['../templates/greiner_masterblock_pcr96.apb',args.tube_spot],

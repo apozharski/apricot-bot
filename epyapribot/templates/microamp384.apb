@@ -1,0 +1,16 @@
+cols:START 70
+cols:DELTA -142
+cols:NSPOTS 24
+cols:AXIS Y
+
+rows:START 288
+rows:DELTA 567
+rows:NSPOTS 16
+rows:AXIS X
+
+tips:START 4500
+tips:DELTA -150
+tips:NSPOTS 8
+tips:AXIS Z
+tips:SAFEZ 3400
+tips:VDELTA 150

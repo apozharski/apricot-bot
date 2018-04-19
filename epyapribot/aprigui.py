@@ -9,7 +9,7 @@ from target import set_the_stage, name_template
 
 class ABotGUI(ABotFrame):
     def __init__(self, *args, **kwds):
-        wx.ABotFrame.__init__(self, *args, **kwds)
+        ABotFrame.__init__(self, *args, **kwds)
         self.plates = {}
         self.roboperator = self.SetRobOperator()
     def SetRobOperator(self, plates=None):
@@ -121,7 +121,7 @@ class ABotGUI(ABotFrame):
     def GetKeyRCTvol(self):
         key = 'spot' + self.radio_box_op_spot.GetStringSelection()
         rct = [int(x.GetValue()) for x in [self.text_ctrl_op_row, self.text_ctrl_op_col, self.text_ctrl_op_tip]]
-        vol = int(elf.text_ctrl_op_vol.GetValue()
+        vol = int(elf.text_ctrl_op_vol.GetValue())
         return key, rct, vol
 
     def wxOperateMove(self, event):
@@ -149,11 +149,11 @@ class ABotGUI(ABotFrame):
         self.roboperator.washRCT(key, rct, vol)
         event.Skip()
 
-c    def wxOperateHome(self, event):
+    def wxOperateHome(self, event):
         self.roboperator.home()
         event.Skip()
 
-lass ABotApp(wx.App):
+class ABotApp(wx.App):
     def OnInit(self):
         abotTopFrame = ABotGUI(None, -1, "")
         self.SetTopWindow(abotTopFrame)
