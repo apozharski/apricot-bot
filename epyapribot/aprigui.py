@@ -121,7 +121,7 @@ class ABotGUI(ABotFrame):
     def GetKeyRCTvol(self):
         key = 'spot' + self.radio_box_op_spot.GetStringSelection()
         rct = [int(x.GetValue()) for x in [self.text_ctrl_op_row, self.text_ctrl_op_col, self.text_ctrl_op_tip]]
-        vol = int(elf.text_ctrl_op_vol.GetValue())
+        vol = int(self.text_ctrl_op_vol.GetValue())
         return key, rct, vol
 
     def wxOperateMove(self, event):

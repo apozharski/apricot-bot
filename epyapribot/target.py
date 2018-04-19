@@ -105,6 +105,7 @@ def load_template(fname, parent=None, label=None):
     elif axtype == 'V':
         target = ApriTargetV
     else:
+        print fname
         raise(ValueError('Unknown target axis: '+axtype))
     start = int(defns.pop('start',0))
     delta = int(defns.pop('delta',0))
@@ -116,7 +117,7 @@ def load_template(fname, parent=None, label=None):
 def name_template(fname):
     with open(fname) as fin:
         ptrn_def = re.compile("^name:(.*)")
-        tname = (' '.join([x.groups()[0] for x in [ptrn_def.match(x) for x in lines] if x])).strip()
+        tname = (' '.join([x.groups()[0] for x in [ptrn_def.match(x) for x in fin.readlines()] if x])).strip()
     return tname if tname else 'Undefined'
 
 class Plate:
@@ -141,10 +142,10 @@ class Plate:
         self.tips.homedn(bot)
 
 class Stage:
-    def __init__(self, plates, robot, *args, **kwds):
+    def __init__(self, plates, robot, rbname, *args, **kwds):
         self.plates = plates
         self.robot = robot
-        self.piston = load_template(plates['base'],None,'tips')
+        self.piston = load_template(rbname,None,'tips')
         self.piston.goto(self.robot)
     def __attach(self, key):
         self.piston.set_parent(self.plates[key].tips)
@@ -243,7 +244,7 @@ def set_the_stage(plates, dry_run=False):
     else:
         robot = None
     rbase = ApriTarget()
-    rbname = [x[0] for x in plates if x[1]==0][0]
-    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase,rbname)) for x in plates.iteritems()]), robot)
-    roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems()]))
+    rbname = [x[0] for x in plates.values() if x[1]==0][0]
+    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase,rbname)) for x in plates.iteritems() if x[1][1]]), robot, rbname)
+    roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems() if x[1][1]]))
     return roboperator

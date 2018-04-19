@@ -1,3 +1,5 @@
+name:BioRAD 384 PCR
+
 cols:START 70
 cols:DELTA -142
 cols:NSPOTS 24
@@ -8,9 +10,9 @@ rows:DELTA 567
 rows:NSPOTS 16
 rows:AXIS X
 
-tips:START 4500
-tips:DELTA -150
-tips:NSPOTS 8
+tips:START 4350
+tips:DELTA -50
+tips:NSPOTS 2
 tips:AXIS Z
 tips:SAFEZ 3400
-tips:VDELTA 150
+tips:VDELTA 50
