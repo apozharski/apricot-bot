@@ -5,8 +5,16 @@
 import wx
 from gui.ABotFrame import ABotFrame
 from abot import TheBot
+from target import set_the_stage, name_template
 
 class ABotGUI(ABotFrame):
+    def __init__(self, *args, **kwds):
+        wx.ABotFrame.__init__(self, *args, **kwds)
+        self.plates = {}
+        self.roboperator = self.SetRobOperator()
+    def SetRobOperator(self, plates=None):
+        plates = self.plates if plates is None else plates
+        self.roboperator = set_the_stage(plates)
     def SetRobot(self, robot):
         self.robot = robot
     def RobotReady(self):
@@ -59,8 +67,93 @@ class ABotGUI(ABotFrame):
             self.robot.pgoto(self.spin_ctrl_p.GetValue())
         event.Skip()
 
+    def ImportSpot(self, spot, namectrl):
+        dlg = wx.FileDialog(self, "Import spot %d template" % spot, "", "", "APB files (*.apb)|*.apb|All files (*.*)|*.*", wx.OPEN)
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                key = 'spot%d' % spot
+                self.plates[key] = [dlg.GetPath(),spot]
+                self.SetRobOperator()
+                namectrl.SetValue(name_template(dlg.GetPath()))
+            else:
+                dlg.Destroy()
+        finally:
+            dlg.Destroy()
 
-class ABotApp(wx.App):
+    def UpdateSpot(self, spot, namectrl):
+        key = 'spot%d' % spot
+        if key in self.plates:
+            self.SetRobOperator()
+            namectrl.SetValue(name_template(self.plates[key][0]))
+
+    def wxImportSpot1(self, event):
+        self.ImportSpot(1,self.text_ctrl_tspot1)
+        event.Skip()
+
+    def wxImportSpot2(self, event):
+        self.ImportSpot(2,self.text_ctrl_tspot2)
+        event.Skip()
+
+    def wxImportSpot3(self, event):
+        self.ImportSpot(3,self.text_ctrl_tspot3)
+        event.Skip()
+
+    def wxImportSpot4(self, event):
+        self.ImportSpot(4,self.text_ctrl_tspot4)
+        event.Skip()
+
+    def wxUpdateSpot1(self, event):
+        self.UpdateSpot(1,self.text_ctrl_tspot1)
+        event.Skip()
+
+    def wxUpdateSpot2(self, event):
+        self.UpdateSpot(2,self.text_ctrl_tspot2)
+        event.Skip()
+
+    def wxUpdateSpot3(self, event):
+        self.UpdateSpot(3,self.text_ctrl_tspot3)
+        event.Skip()
+
+    def wxUpdateSpot4(self, event):
+        self.UpdateSpot(4,self.text_ctrl_tspot4)
+        event.Skip()
+
+    def GetKeyRCTvol(self):
+        key = 'spot' + self.radio_box_op_spot.GetStringSelection()
+        rct = [int(x.GetValue()) for x in [self.text_ctrl_op_row, self.text_ctrl_op_col, self.text_ctrl_op_tip]]
+        vol = int(elf.text_ctrl_op_vol.GetValue()
+        return key, rct, vol
+
+    def wxOperateMove(self, event):
+        key, rct = self.GetKeyRCTvol()[:2]
+        self.roboperator.gotoRCT(key, rct)
+        event.Skip()
+
+    def wxOperateAspirate(self, event):
+        key, rct, vol = self.GetKeyRCTvol()
+        self.roboperator.aspirateRCT(key, rct, vol)
+        event.Skip()
+
+    def wxOperateDispense(self, event):
+        key, rct, vol = self.GetKeyRCTvol()
+        self.roboperator.dispenseRCT(key, rct, vol)
+        event.Skip()
+
+    def wxOperatePurge(self, event):
+        key, rct = self.GetKeyRCTvol()[:2]
+        self.roboperator.emptyRCT(key, rct)
+        event.Skip()
+
+    def wxOperateWash(self, event):
+        key, rct, vol = self.GetKeyRCTvol()
+        self.roboperator.washRCT(key, rct, vol)
+        event.Skip()
+
+c    def wxOperateHome(self, event):
+        self.roboperator.home()
+        event.Skip()
+
+lass ABotApp(wx.App):
     def OnInit(self):
         abotTopFrame = ABotGUI(None, -1, "")
         self.SetTopWindow(abotTopFrame)

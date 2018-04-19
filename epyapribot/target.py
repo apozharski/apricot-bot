@@ -113,6 +113,12 @@ def load_template(fname, parent=None, label=None):
     vdelta = int(defns.pop('vdelta',0))
     return target(parent, start, delta, nspots, safez=safez, vdelta=vdelta)
 
+def name_template(fname):
+    with open(fname) as fin:
+        ptrn_def = re.compile("^name:(.*)")
+        tname = (' '.join([x.groups()[0] for x in [ptrn_def.match(x) for x in lines] if x])).strip()
+    return tname if tname else 'Undefined'
+
 class Plate:
     def __init__(self, fname, robobase, *args, **kwds):
         self.spots = load_template('../templates/apribot.apb',robobase,'spot')
@@ -165,6 +171,9 @@ class Stage:
             safez = min([x.tips.get_safez() for x in self.plates.values()])
         self.__attach(key)
         self.piston.safe_goto(self.robot, safez)
+    def gotoRCT(self, key, rct):
+        self.SetRCT(key, rct)
+        self.goto(key)
     def aspirate(self, key, value):
         self.goto(key)
         self.piston.moveup(value, self.robot)
