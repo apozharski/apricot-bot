@@ -158,12 +158,16 @@ class ABotGUI(ABotFrame):
         if self.RobotReady():
             if ax == 'x':
                 self.robot.xgoto(self.robot.get_x()+v)
+                self.label_stepperX.SetLabel('X=%5d' % self.robot.get_x())
             if ax == 'y':
                 self.robot.xgoto(self.robot.get_y+v)
+                self.label_stepperY.SetLabel('Y=%5d' % self.robot.get_y())
             if ax == 'z':
                 self.robot.xgoto(self.robot.get_z+v)
+                self.label_stepperZ.SetLabel('Z=%5d' % self.robot.get_z())
             if ax == 'v':
                 self.robot.xgoto(self.robot.get_v+v)
+                self.label_stepperV.SetLabel('V=%5d' % self.robot.get_v())
 
     def onStepXm(self, event):
         self.wxStepDo('x',-int(self.choice_xm.GetStringSelection()))
