@@ -12,6 +12,7 @@ class ABotGUI(ABotFrame):
         ABotFrame.__init__(self, *args, **kwds)
         self.plates = {'robobase'  :   ['templates/apribot.apb', 0]}
         self.roboperator = self.SetRobOperator()
+        self.robot = self.roboperator.get_the_bot()
     def SetRobOperator(self, plates=None):
         plates = self.plates if plates is None else plates
         self.roboperator = set_the_stage(plates)
@@ -151,6 +152,177 @@ class ABotGUI(ABotFrame):
 
     def wxOperateHome(self, event):
         self.roboperator.home()
+        event.Skip()
+
+    def wxStepDo(self, ax, v):
+        if self.RobotReady():
+            if ax == 'x':
+                self.robot.xgoto(self.robot.get_x()+v)
+            if ax == 'y':
+                self.robot.xgoto(self.robot.get_y+v)
+            if ax == 'z':
+                self.robot.xgoto(self.robot.get_z+v)
+            if ax == 'v':
+                self.robot.xgoto(self.robot.get_v+v)
+
+    def onStepXm(self, event):
+        self.wxStepDo('x',-int(self.choice_xm.GetStringSelection()))
+        event.Skip()
+
+    def onStepXm1000(self, event):
+        self.wxStepDo('x',-1000)
+        event.Skip()
+
+    def onStepXm100(self, event):
+        self.wxStepDo('x',-100)
+        event.Skip()
+
+    def onStepXm10(self, event):
+        self.wxStepDo('x',-10)
+        event.Skip()
+
+    def onStepXm1(self, event):
+        self.wxStepDo('x',-1)
+        event.Skip()
+
+    def onStepXp1(self, event):
+        self.wxStepDo('x',1)
+        event.Skip()
+
+    def onStepXp10(self, event):
+        self.wxStepDo('x',10)
+        event.Skip()
+
+    def onStepXp100(self, event):
+        self.wxStepDo('x',100)
+        event.Skip()
+
+    def onStepXp1000(self, event):
+        self.wxStepDo('x',1000)
+        event.Skip()
+
+    def onStepXp(self, event):
+        self.wxStepDo('x',int(self.choice_xp.GetStringSelection()))
+        event.Skip()
+
+    def onStepYm(self, event):
+        self.wxStepDo('y',-int(self.choice_ym.GetStringSelection()))
+        event.Skip()
+
+    def onStepYm1000(self, event):
+        self.wxStepDo('y',-1000)
+        event.Skip()
+
+    def onStepYm100(self, event):
+        self.wxStepDo('y',-100)
+        event.Skip()
+
+    def onStepYm10(self, event):
+        self.wxStepDo('y',-10)
+        event.Skip()
+
+    def onStepYm1(self, event):
+        self.wxStepDo('y',-1)
+        event.Skip()
+
+    def onStepYp1(self, event):
+        self.wxStepDo('y',1)
+        event.Skip()
+
+    def onStepYp10(self, event):
+        self.wxStepDo('y',10)
+        event.Skip()
+
+    def onStepYp100(self, event):
+        self.wxStepDo('y',100)
+        event.Skip()
+
+    def onStepYp1000(self, event):
+        self.wxStepDo('y',1000)
+        event.Skip()
+
+    def onStepYp(self, event):
+        self.wxStepDo('y',int(self.choice_ym.GetStringSelection()))
+        event.Skip()
+
+    def onStepZm(self, event):
+        self.wxStepDo('z',-int(self.choice_zm.GetStringSelection()))
+        event.Skip()
+
+    def onStepZm1000(self, event):
+        self.wxStepDo('z',-1000)
+        event.Skip()
+
+    def onStepZm100(self, event):
+        self.wxStepDo('z',-100)
+        event.Skip()
+
+    def onStepZm10(self, event):
+        self.wxStepDo('z',-10)
+        event.Skip()
+
+    def onStepZm1(self, event):
+        self.wxStepDo('z',-1)
+        event.Skip()
+
+    def onStepZp1(self, event):
+        self.wxStepDo('z',1)
+        event.Skip()
+
+    def onStepZp10(self, event):
+        self.wxStepDo('z',10)
+        event.Skip()
+
+    def onStepZp100(self, event):
+        self.wxStepDo('z',100)
+        event.Skip()
+
+    def onStepZp1000(self, event):
+        self.wxStepDo('z',1000)
+        event.Skip()
+
+    def onStepZp(self, event):
+        self.wxStepDo('z',int(self.choice_zm.GetStringSelection()))
+        event.Skip()
+
+    def onStepVm(self, event):
+        self.wxStepDo('v',-int(self.choice_vm.GetStringSelection()))
+        event.Skip()
+
+    def onStepVm1000(self, event):
+        self.wxStepDo('v',-1000)
+        event.Skip()
+
+    def onStepVm100(self, event):
+        self.wxStepDo('v',-100)
+        event.Skip()
+
+    def onStepVm10(self, event):
+        self.wxStepDo('v',-10)
+        event.Skip()
+
+    def onStepVm1(self, event):
+        self.wxStepDo('v',-1)
+        event.Skip()
+
+    def onStepVp1(self, event):
+        self.wxStepDo('v',1)
+        event.Skip()
+
+    def onStepVp10(self, event):
+        self.wxStepDo('v',10)
+        event.Skip()
+
+    def onStepVp100(self, event):
+        self.wxStepDo('v',100)
+        event.Skip()
+
+    def onStepVp1000(self, event):
+        self.wxStepDo('v',1000)
+        event.Skip()
+
+    def onStepVp(self, event):
+        self.wxStepDo('v',int(self.choice_vm.GetStringSelection()))
         event.Skip()
 
 class ABotApp(wx.App):

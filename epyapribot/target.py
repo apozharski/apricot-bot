@@ -149,6 +149,8 @@ class Stage:
         self.piston.goto(self.robot)
     def __attach(self, key):
         self.piston.set_parent(self.plates[key].tips)
+    def get_the_bot(self):
+        return self.robot
     def SetSpots(self, spots):
         for key, value in spots.iteritems():
             if value:

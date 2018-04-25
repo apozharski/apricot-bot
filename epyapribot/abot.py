@@ -116,3 +116,11 @@ class TheBot(object):
                 exec('self.'+c.replace('v','p')+'goto('+c+')')
         if safez is not None:
             self.zgoto(z)
+    def get_x(self):
+        return self.x
+    def get_y(self):
+        return self.y
+    def get_z(self):
+        return self.z
+    def get_v(self):
+        return self.piston
