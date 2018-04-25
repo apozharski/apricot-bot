@@ -1,4 +1,4 @@
-import re, sys
+import re, sys, time
 from abot import TheBot
 class ApriTarget(object):
     def __init__(self, parent=None, *args, **kwds):
@@ -142,11 +142,12 @@ class Plate:
         self.tips.homedn(bot)
 
 class Stage:
-    def __init__(self, plates, robot, rbname, *args, **kwds):
+    def __init__(self, plates, robot, rbname, sleeptime=0, *args, **kwds):
         self.plates = plates
         self.robot = robot
         self.piston = load_template(rbname,None,'tips')
         self.piston.goto(self.robot)
+        self.sleeptime = sleeptime
     def __attach(self, key):
         self.piston.set_parent(self.plates[key].tips)
     def get_the_bot(self):
@@ -181,6 +182,7 @@ class Stage:
     def aspirate(self, key, value):
         self.goto(key)
         self.piston.moveup(value, self.robot)
+        time.sleep(self.sleeptime)
     def aspirateRCT(self, key, rct, value, msg=None):
         if msg is not None:
             sys.stdout.write(msg)
@@ -191,6 +193,7 @@ class Stage:
     def dispense(self, key, value):
         self.goto(key)
         self.piston.movedn(value, self.robot)
+        time.sleep(self.sleeptime)
     def dispenseRCT(self, key, rct, value, msg=None, dip=True):
         if msg is not None:
             sys.stdout.write(msg)
@@ -240,13 +243,13 @@ class Stage:
         self.plates[key].tips.set_pos(tipos)
         self.piston.goto(self.robot)
 
-def set_the_stage(plates, dry_run=False):
+def set_the_stage(plates, dry_run=False, sleeptime=0):
     if not dry_run:
         robot = TheBot()
     else:
         robot = None
     rbase = ApriTarget()
     rbname = [x[0] for x in plates.values() if x[1]==0][0]
-    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase,rbname)) for x in plates.iteritems() if x[1][1]]), robot, rbname)
+    roboperator = Stage(dict([(x[0],Plate(x[1][0],rbase,rbname)) for x in plates.iteritems() if x[1][1]]), robot, rbname, sleeptime=sleeptime)
     roboperator.SetSpots(dict([(x[0],x[1][1]) for x in plates.iteritems() if x[1][1]]))
     return roboperator

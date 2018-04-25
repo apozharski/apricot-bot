@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--manual-wash', action='store_true', help='Wash tips manually (may be faster)')
     parser.add_argument('--plate-type', default='intelliplate', help='Target plate type, must match an available template')
     parser.add_argument('--stock-type', default='greiner_masterblock', help='Stock plate type, must match an available template')
+    parser.add_argument('--sleeptime', default=0, type=int, help='Seconds of delay after aspiration/dispensing')
     
     args = parser.parse_args()
     
@@ -53,7 +54,7 @@ def main():
     for key, value in reqvols.iteritems():
         foo = raw_input("CHECK: Stock DeepWell block row %d is filled with %d ul of reagent." % (key, value+args.cush_vol))
 
-    roboperator = set_the_stage(plates, args.dry_run)
+    roboperator = set_the_stage(plates, args.dry_run, sleeptime=args.sleeptime)
 
     for grad in args.grad:
         stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
