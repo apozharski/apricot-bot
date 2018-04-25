@@ -21,6 +21,8 @@ def main():
     parser.add_argument('--cush-vol', default=50, type=int, help='Cushion volume')
     parser.add_argument('--dry-run', action='store_true', help='Dry run.')
     parser.add_argument('--manual-wash', action='store_true', help='Wash tips manually (may be faster)')
+    parser.add_argument('--plate-type', default='intelliplate', help='Target plate type, must match an available template')
+    parser.add_argument('--stock-type', default='greiner_masterblock', help='Stock plate type, must match an available template')
     
     args = parser.parse_args()
     
@@ -32,8 +34,8 @@ def main():
 
     plates = {
         'robobase'  :   ['../templates/apribot.apb', 0],
-        'plate'      :   ['../templates/nunc96.apb',args.plate_spot],
-        'stock'   :   ['../templates/greiner_masterblock.apb',args.stock_spot],
+        'plate'     :   ['../templates/'+args.plate_type+'.apb',args.plate_spot],
+        'stock'     :   ['../templates/'+args.stock_type+'.apb',args.stock_spot],
         }
 
     reqvols = {}
