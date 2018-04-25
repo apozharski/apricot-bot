@@ -11,11 +11,11 @@ class ABotGUI(ABotFrame):
     def __init__(self, *args, **kwds):
         ABotFrame.__init__(self, *args, **kwds)
         self.plates = {'robobase'  :   ['templates/apribot.apb', 0]}
-        self.roboperator = self.SetRobOperator()
-        self.robot = self.roboperator.get_the_bot()
+        self.SetRobOperator()
     def SetRobOperator(self, plates=None):
         plates = self.plates if plates is None else plates
         self.roboperator = set_the_stage(plates)
+        self.robot = self.roboperator.get_the_bot()
     def SetRobot(self, robot):
         self.robot = robot
     def RobotReady(self):
@@ -160,13 +160,13 @@ class ABotGUI(ABotFrame):
                 self.robot.xgoto(self.robot.get_x()+v)
                 self.label_stepperX.SetLabel('X=%5d' % self.robot.get_x())
             if ax == 'y':
-                self.robot.xgoto(self.robot.get_y+v)
+                self.robot.ygoto(self.robot.get_y()+v)
                 self.label_stepperY.SetLabel('Y=%5d' % self.robot.get_y())
             if ax == 'z':
-                self.robot.xgoto(self.robot.get_z+v)
+                self.robot.zgoto(self.robot.get_z()+v)
                 self.label_stepperZ.SetLabel('Z=%5d' % self.robot.get_z())
             if ax == 'v':
-                self.robot.xgoto(self.robot.get_v+v)
+                self.robot.pgoto(self.robot.get_v()+v)
                 self.label_stepperV.SetLabel('V=%5d' % self.robot.get_v())
 
     def onStepXm(self, event):
