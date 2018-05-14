@@ -14,7 +14,8 @@ def main():
                         description=headerhelp)
     parser.add_argument('--plate-spot', default=3, type=int, help='Location of the plate')
     parser.add_argument('--stock-spot', default=2, type=int, help='Location of the stocks')
-    parser.add_argument('--wash-col', default=12, type=int, help='Column of the stock block for washing the tips')
+    parser.add_argument('--wash-col', type=int, help='Column of the stock block for washing the tips')
+    parser.add_argument('--wash-spot', type=int, help='Location of the rinse water basin')
     parser.add_argument('-g', '--grad', action='append', help='Gradient definitions: stockCol,firstVolume,lastVolume,firstCol,lastCol')
     parser.add_argument('--xv', default=5, type=int, help='Overhead volume')
     parser.add_argument('--maxv', default=300, type=int, help='Maximum volume')
@@ -31,13 +32,24 @@ def main():
         sys.exit('No gradients are defined. Check your parameters.')
     foo = raw_input("CHECK: Target plate in position "+str(args.plate_spot))
     foo = raw_input("CHECK: Stock DeepWell block in position "+str(args.stock_spot))
-    foo = raw_input("CHECK: Wash column (%d) of the stock block is filled with water" % args.wash_col)
+    if args.wash_col is None and args.wash_spot is None and not args.manual_wash:
+        foo = raw_input("CHECK: No washing option provided, assume manual wash.")
+        args.manual_wash = True
+    if args.wash_col is not None and args.wash_spot is not None:
+        foo = raw_input("CHECK: Both block and basin washes resuested.  Assume basin wash.")
+        args.wash_col = None
+    if args.wash_col is not None:
+        foo = raw_input("CHECK: Wash column (%d) of the stock block is filled with water" % args.wash_col)
+    if args.wash_spot is not None:
+        foo = raw_input("CHECK: Wash basin in position "+str(args.wash_spot))
 
     plates = {
         'robobase'  :   ['../templates/apribot.apb', 0],
         'plate'     :   ['../templates/'+args.plate_type+'.apb',args.plate_spot],
         'stock'     :   ['../templates/'+args.stock_type+'.apb',args.stock_spot],
         }
+    if args.wash_spot is not None:
+        plates['wash'] = ['../templates/wash.apb',args.wash_spot]
 
     reqvols = {}
     for grad in args.grad:
@@ -83,8 +95,10 @@ def main():
         roboperator.emptyRCT('stock', (1, stockCol, 6))
         if args.manual_wash:
             foo = raw_input("Wash and/or replace the tips.  Hit ENTER when done.")
-        else:
+        elif args.wash_col is not None:
             roboperator.washRCT('stock', (1,args.wash_col,2), args.maxv+args.xv)
+        elif args.wash_spot is not None:
+            roboperator.washRCT('wash', (1,1,1), args.maxv+args.xv)
     
     roboperator.home()
 
