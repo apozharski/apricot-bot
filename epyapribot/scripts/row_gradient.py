@@ -53,7 +53,7 @@ def main():
         plates['wash'] = ['../templates/wash.apb',args.wash_spot]
     reqvols = {}
     for grad in args.grad:
-        stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
+        stockRow,topVolume,bottomVolume,topRow,bottomRow,colShift = [int(x) for x in grad.split(',')]
         numRows = abs(topRow-bottomRow)+1
         dispDir = sign(bottomRow-topRow+0.1).astype(int)
         if numRows>1:
@@ -69,7 +69,7 @@ def main():
     roboperator = set_the_stage(plates, args.dry_run, sleeptime=args.sleeptime)
 
     for grad in args.grad:
-        stockRow,topVolume,bottomVolume,topRow,bottomRow = map(int, grad.split(','))
+        stockRow,topVolume,bottomVolume,topRow,bottomRow,colShift = [int(x) for x in grad.split(',')]
         numRows = abs(topRow-bottomRow)+1
         dispDir = sign(bottomRow-topRow+0.1).astype(int)
         if numRows>1:
